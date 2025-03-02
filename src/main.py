@@ -2,6 +2,7 @@
 # Choose your main deck from a list of cards
 # Choose your extra deck from a list of cards
 # Choose your side deck from a list of cards
+# Search bar
 # Display currently selected cards in a list
 # Be able to remove cards from deck
 # Be able to submit deck
