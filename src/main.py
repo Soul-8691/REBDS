@@ -62,16 +62,16 @@ def on_item_click(self, item):
         image_label = tk.Label(self.main_deck_cards, image=photo)
         x = (self.main_deck_card_count - 1) * 110
         y = 0
-        if self.main_deck_card_count / 12 > 1 and self.main_deck_card_count / 12 < 2:
+        if self.main_deck_card_count / 12 > 1 and self.main_deck_card_count / 12 <= 2:
             x = x - 1320
             y = y + 159
-        elif self.main_deck_card_count  / 12 > 2 and self.main_deck_card_count  / 12 < 3:
+        elif self.main_deck_card_count  / 12 > 2 and self.main_deck_card_count  / 12 <= 3:
             x = x - 1320*2
             y = y + 159*2
-        elif self.main_deck_card_count  / 12 > 3 and self.main_deck_card_count  / 12 < 4:
+        elif self.main_deck_card_count  / 12 > 3 and self.main_deck_card_count  / 12 <= 4:
             x = x - 1320*3
             y = y + 159*3
-        elif self.main_deck_card_count  / 12 > 4 and self.main_deck_card_count  / 12 < 5:
+        elif self.main_deck_card_count  / 12 > 4 and self.main_deck_card_count  / 12 <= 5:
             x = x - 1320*4
             y = y + 159*4
         elif self.main_deck_card_count  / 12 > 5:
