@@ -68,19 +68,19 @@ def on_item_click(self, item):
             image_label = tk.Label(self.main_deck_cards, image=photo)
             x = i * 110
             y = 0
-            if self.main_deck_card_count / 12 > 1 and self.main_deck_card_count / 12 <= 2:
+            if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
                 x = x - 1320
                 y = y + 159
-            elif self.main_deck_card_count  / 12 > 2 and self.main_deck_card_count  / 12 <= 3:
+            elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
                 x = x - 1320*2
                 y = y + 159*2
-            elif self.main_deck_card_count  / 12 > 3 and self.main_deck_card_count  / 12 <= 4:
+            elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
                 x = x - 1320*3
                 y = y + 159*3
-            elif self.main_deck_card_count  / 12 > 4 and self.main_deck_card_count  / 12 <= 5:
+            elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
                 x = x - 1320*4
                 y = y + 159*4
-            elif self.main_deck_card_count  / 12 > 5:
+            elif (i + 1)  / 12 > 5:
                 x = x - 1320*5
                 y = y + 159*5
             image_label.place(x=x, y=y)
@@ -113,19 +113,19 @@ def on_item_right_click(self, item):
             image_label = tk.Label(self.main_deck_cards, image=photo)
             x = i * 110
             y = 0
-            if self.main_deck_card_count / 12 > 1 and self.main_deck_card_count / 12 <= 2:
+            if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
                 x = x - 1320
                 y = y + 159
-            elif self.main_deck_card_count  / 12 > 2 and self.main_deck_card_count  / 12 <= 3:
+            elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
                 x = x - 1320*2
                 y = y + 159*2
-            elif self.main_deck_card_count  / 12 > 3 and self.main_deck_card_count  / 12 <= 4:
+            elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
                 x = x - 1320*3
                 y = y + 159*3
-            elif self.main_deck_card_count  / 12 > 4 and self.main_deck_card_count  / 12 <= 5:
+            elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
                 x = x - 1320*4
                 y = y + 159*4
-            elif self.main_deck_card_count  / 12 > 5:
+            elif (i + 1)  / 12 > 5:
                 x = x - 1320*5
                 y = y + 159*5
             image_label.place(x=x, y=y)
