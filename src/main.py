@@ -42,23 +42,22 @@ def update_json_file(file_path, new_data):
 
 def on_item_click(self, item):
     clear_window(root.main_deck_cards)
-    if self.main_deck_card_count == 60:
+    if root.main_deck_card_count == 60:
             messagebox.showinfo("Main deck full", "You have reached the main deck card limit. Please either submit your deck or remove cards.")
     elif self.click_counts[item] == 3:
         messagebox.showinfo("Card limit reached", "You have reached the 3 card limit, already.")
     else:
         self.click_counts[item] += 1
         update_json_file('src/main_deck.json', {item: self.click_counts[item]})
-        self.main_deck_card_count += 1
         root.main_deck_card_count += 1
-        self.item_dict.update({item: self.click_counts[item]})
-        self.listbox.delete(0, tk.END)
-        self.listbox.insert(0, 'Cards in deck: ' + str(self.main_deck_card_count))
-        for item in sorted(list(self.item_dict)):
+        root.item_dict.update({item: self.click_counts[item]})
+        root.listbox.delete(0, tk.END)
+        root.listbox.insert(0, 'Cards in deck: ' + str(root.main_deck_card_count))
+        for item in sorted(list(root.item_dict)):
             if self.click_counts[item] > 0:
-                self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
+                root.listbox.insert(tk.END, item + ': ' + str(root.item_dict[item]))
         i = 0
-        for item in sorted(list(Counter(self.item_dict).elements())):
+        for item in sorted(list(Counter(root.item_dict).elements())):
             try:
                 img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
                 photo = ImageTk.PhotoImage(img)
@@ -94,16 +93,15 @@ def on_item_right_click(self, item):
     else:
         self.click_counts[item] -= 1
         update_json_file('src/main_deck.json', {item: self.click_counts[item]})
-        self.main_deck_card_count -= 1
         root.main_deck_card_count -= 1
-        self.item_dict.update({item: self.click_counts[item]})
-        self.listbox.delete(0, tk.END)
-        self.listbox.insert(0, 'Cards in deck: ' + str(self.main_deck_card_count))
-        for item in sorted(list(self.item_dict)):
+        root.item_dict.update({item: self.click_counts[item]})
+        root.listbox.delete(0, tk.END)
+        root.listbox.insert(0, 'Cards in deck: ' + str(root.main_deck_card_count))
+        for item in sorted(list(root.item_dict)):
             if self.click_counts[item] > 0:
-                self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
+                root.listbox.insert(tk.END, item + ': ' + str(root.item_dict[item]))
         i = 0
-        for item in sorted(list(Counter(self.item_dict).elements())):
+        for item in sorted(list(Counter(root.item_dict).elements())):
             try:
                 img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
                 photo = ImageTk.PhotoImage(img)
@@ -144,7 +142,7 @@ def hide_button(self):
     self.pack_forget()
 
 def on_button_click(self):
-    if self.main_deck_card_count < 40:
+    if root.main_deck_card_count < 40:
         messagebox.showinfo("Invalid deck size", "Your deck needs to consist of 40-60 cards.")
     else:
         messagebox.showinfo("Deck submitted", "Your deck is legal! Deck submitted.")
@@ -192,14 +190,6 @@ class VirtualListbox(tk.Canvas):
         self.config(yscrollcommand=self.scroll_y.set)
         self.bind("<MouseWheel>", self.on_mousewheel)
         self.viewable_start = 0
-        self.main_deck_card_count = 0
-        self.listbox_window = tk.Toplevel()
-        self.listbox_window.title("Main deck")
-        self.listbox = tk.Listbox(self.listbox_window, width=50, height=35)
-        self.listbox.pack()
-        self.item_dict = OrderedDict()
-        self.card_image = tk.Toplevel()
-        self.card_image.title("Card image")
         self.update_list()
 
     def update_list(self):
@@ -210,8 +200,8 @@ class VirtualListbox(tk.Canvas):
             self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=''.join(e for e in item if e.isalnum()))
             self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-1>", lambda event, itm=item: on_item_click(self, itm))
             self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-3>", lambda event, itm=item: on_item_right_click(self, itm))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), '<Enter>', lambda event, itm=item: onEnter(self, self.card_image, itm))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), '<Leave>', lambda event, itm=item: onLeave(self, self.card_image, itm))
+            self.tag_bind(''.join(e for e in item if e.isalnum()), '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
+            self.tag_bind(''.join(e for e in item if e.isalnum()), '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
         self.config(scrollregion=(0, 0, 0, len(self.items) * self.item_height))
 
     def yview(self, *args):
@@ -236,8 +226,23 @@ if __name__ == '__main__':
     button.pack()
     root.main_deck_cards = tk.Toplevel()
     root.main_deck_cards.title("Cards (main deck)")
+    root.main_deck_cards.withdraw()
     button2 = tk.Button(root, text="Show/hide main deck cards", command=partial(toggle_toplevel, root.main_deck_cards))
     button2.pack()
+    root.listbox_window = tk.Toplevel()
+    root.listbox_window.title("Main deck")
+    root.listbox = tk.Listbox(root.listbox_window, width=50, height=35)
+    root.listbox.pack()
+    button3 = tk.Button(root, text="Show/hide main deck", command=partial(toggle_toplevel, root.listbox_window))
+    button3.pack()
+    root.listbox_window.withdraw()
+    root.card_image = tk.Toplevel()
+    root.card_image.title("Card image")
+    button4 = tk.Button(root, text="Show/hide card images", command=partial(toggle_toplevel, root.card_image))
+    button4.pack()
+    root.card_image.withdraw()
+    root.item_dict = OrderedDict()
+    root.main_deck_card_count = 0
     card_info_data = open('src/YGOProDeck_Card_Info.json')
     card_info_data = json.load(card_info_data)
     items = {}
