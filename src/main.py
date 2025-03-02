@@ -28,7 +28,7 @@ open('src/main_deck.json', 'w').close()
 
 def update_json_file(file_path, new_data):
     try:
-        with open(file_path, 'w+') as file:
+        with open(file_path, 'r+') as file:
             try:
                 data = json.load(file)
             except json.JSONDecodeError:
@@ -48,7 +48,7 @@ def on_item_click(self, item):
         messagebox.showinfo("Card limit reached", "You have reached the 3 card limit, already.")
     else:
         self.click_counts[item] += 1
-        update_json_file('main_deck.json', {item: self.click_counts[item]})
+        update_json_file('src/main_deck.json', {item: self.click_counts[item]})
         self.main_deck_card_count += 1
         root.main_deck_card_count += 1
         self.item_dict.update({item: self.click_counts[item]})
@@ -93,7 +93,7 @@ def on_item_right_click(self, item):
             messagebox.showinfo("Card not in deck", "This card cannot be removed because it is not in your deck, already.")
     else:
         self.click_counts[item] -= 1
-        update_json_file('main_deck.json', {item: self.click_counts[item]})
+        update_json_file('src/main_deck.json', {item: self.click_counts[item]})
         self.main_deck_card_count -= 1
         root.main_deck_card_count -= 1
         self.item_dict.update({item: self.click_counts[item]})
