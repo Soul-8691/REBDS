@@ -41,7 +41,7 @@ def update_json_file(file_path, new_data):
         print(f"An error occurred: {e}")
 
 def on_item_click(self, item):
-    clear_window(self.main_deck_cards)
+    clear_window(root.main_deck_cards)
     if self.main_deck_card_count == 60:
             messagebox.showinfo("Main deck full", "You have reached the main deck card limit. Please either submit your deck or remove cards.")
     elif self.click_counts[item] == 3:
@@ -65,7 +65,7 @@ def on_item_click(self, item):
             except FileNotFoundError:
                 print("Error: Image file not found.")
                 exit()
-            image_label = tk.Label(self.main_deck_cards, image=photo)
+            image_label = tk.Label(root.main_deck_cards, image=photo)
             x = i * 110
             y = 0
             if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
@@ -88,7 +88,7 @@ def on_item_click(self, item):
             i = i + 1
 
 def on_item_right_click(self, item):
-    clear_window(self.main_deck_cards)
+    clear_window(root.main_deck_cards)
     if self.click_counts[item] == 0:
             messagebox.showinfo("Card not in deck", "This card cannot be removed because it is not in your deck, already.")
     else:
@@ -110,7 +110,7 @@ def on_item_right_click(self, item):
             except FileNotFoundError:
                 print("Error: Image file not found.")
                 exit()
-            image_label = tk.Label(self.main_deck_cards, image=photo)
+            image_label = tk.Label(root.main_deck_cards, image=photo)
             x = i * 110
             y = 0
             if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
@@ -149,6 +149,11 @@ def on_button_click(self):
     else:
         messagebox.showinfo("Deck submitted", "Your deck is legal! Deck submitted.")
 
+def toggle_toplevel(toplevel):
+    if toplevel.winfo_ismapped():
+        toplevel.withdraw()  # Hide the window
+    else:
+        toplevel.deiconify() # Show the window
 
 def onEnter(self, card_image, card_name):
     clear_window(card_image)
@@ -195,8 +200,6 @@ class VirtualListbox(tk.Canvas):
         self.item_dict = OrderedDict()
         self.card_image = tk.Toplevel()
         self.card_image.title("Card image")
-        self.main_deck_cards = tk.Toplevel()
-        self.main_deck_cards.title("Cards (main deck)")
         self.update_list()
 
     def update_list(self):
@@ -231,6 +234,10 @@ if __name__ == '__main__':
     root.main_deck_card_count = 0
     button = tk.Button(root, text="Submit main deck", command=partial(on_button_click, root))
     button.pack()
+    root.main_deck_cards = tk.Toplevel()
+    root.main_deck_cards.title("Cards (main deck)")
+    button2 = tk.Button(root, text="Show/hide main deck cards", command=partial(toggle_toplevel, root.main_deck_cards))
+    button2.pack()
     card_info_data = open('src/YGOProDeck_Card_Info.json')
     card_info_data = json.load(card_info_data)
     items = {}
