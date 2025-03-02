@@ -5,6 +5,7 @@
 # Display currently selected cards in a list
 # Be able to remove cards from deck
 # Be able to submit deck
+# Sort cards in deck alphabetically
 # Game starts (pygame)
 # Cards slide into view
 # Cards displayed using pygame
@@ -46,7 +47,7 @@ def on_item_click(self, item):
         self.main_deck_card_count += 1
         self.item_dict.update({item: self.click_counts[item]})
         self.listbox.delete(0, tk.END)
-        for item in self.item_dict:
+        for item in sorted(list(self.item_dict)):
             if self.click_counts[item] > 0:
                 self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
 
@@ -59,9 +60,15 @@ def on_item_right_click(self, item):
         self.main_deck_card_count -= 1
         self.item_dict.update({item: self.click_counts[item]})
         self.listbox.delete(0, tk.END)
-        for item in self.item_dict:
+        for item in sorted(list(self.item_dict)):
             if self.click_counts[item] > 0:
                 self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
+
+def on_button_click(self):
+    if self.main_deck_card_count < 40:
+        messagebox.showinfo("Invalid deck size", "Your deck needs to consist of 40-60 cards.")
+    else:
+        messagebox.showinfo("Deck submitted", "Your deck is legal! Deck submitted.")
 
 class VirtualListbox(tk.Canvas):
     def __init__(self, master, items, **kwargs):
@@ -92,6 +99,8 @@ class VirtualListbox(tk.Canvas):
             self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-1>", lambda event, itm=item: on_item_click(self, itm))
             self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-3>", lambda event, itm=item: on_item_right_click(self, itm))
         self.config(scrollregion=(0, 0, 0, len(self.items) * self.item_height))
+        button = tk.Button(root, text="Submit main deck", command=partial(on_button_click, self))
+        button.pack()
 
     def yview(self, *args):
         if args:
@@ -118,6 +127,7 @@ if __name__ == '__main__':
         if card_name == '7':
             card_name = 'Seven'
         items.append(card_name)
+    items = sorted(items)
     virtual_listbox = VirtualListbox(root, items)
     virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
     root.mainloop()
