@@ -2,6 +2,7 @@
 # Choose your main deck from a list of cards
 # Choose your extra deck from a list of cards
 # Choose your side deck from a list of cards
+# Display currently selected cards in a list
 # Game starts (pygame)
 # Cards slide into view
 # Cards displayed using pygame
@@ -13,10 +14,14 @@
 import tkinter as tk
 import json
 from functools import partial
+from tkinter import messagebox
+from collections import OrderedDict
+
+open('main_deck.json', 'w').close()
 
 def update_json_file(file_path, new_data):
     try:
-        with open(file_path, 'r+') as file:
+        with open(file_path, 'w+') as file:
             try:
                 data = json.load(file)
             except json.JSONDecodeError:
@@ -29,8 +34,18 @@ def update_json_file(file_path, new_data):
         print(f"An error occurred: {e}")
 
 def on_item_click(self, item):
-    self.click_counts[item] += 1
-    update_json_file('main_deck.json', {item: self.click_counts[item]})
+    if self.main_deck_card_count == 60:
+            messagebox.showinfo("Main deck full", "You have reached the main deck card limit. Please either submit your deck or remove cards.")
+    elif self.click_counts[item] == 3:
+        messagebox.showinfo("Card limit reached", "You have reached the 3 card limit, already.")
+    else:
+        self.click_counts[item] += 1
+        update_json_file('main_deck.json', {item: self.click_counts[item]})
+        self.main_deck_card_count += 1
+        self.item_dict.update({item: self.click_counts[item]})
+        self.listbox.delete(0, tk.END)
+        for item in self.item_dict:
+            self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
 
 class VirtualListbox(tk.Canvas):
     def __init__(self, master, items, **kwargs):
@@ -45,6 +60,12 @@ class VirtualListbox(tk.Canvas):
         self.config(yscrollcommand=self.scroll_y.set)
         self.bind("<MouseWheel>", self.on_mousewheel)
         self.viewable_start = 0
+        self.main_deck_card_count = 0
+        self.listbox_window = tk.Toplevel()
+        self.listbox_window.title("Separate Listbox")
+        self.listbox = tk.Listbox(self.listbox_window, width=100)
+        self.listbox.pack()
+        self.item_dict = OrderedDict()
         self.update_list()
 
     def update_list(self):
@@ -70,6 +91,8 @@ class VirtualListbox(tk.Canvas):
 
 if __name__ == '__main__':
     root = tk.Tk()
+    root.title('Red-Eyes Black Duel Simulator')
+    messagebox.showinfo("Main deck", "Construct a main deck consisting of 40-60 cards.")
     card_info_data = open('src/YGOProDeck_Card_Info.json')
     card_info_data = json.load(card_info_data)
     items = []
