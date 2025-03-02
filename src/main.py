@@ -21,7 +21,7 @@ import tkinter as tk
 import json
 from functools import partial
 from tkinter import messagebox
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 from PIL import Image, ImageTk
 
 open('src/main_deck.json', 'w').close()
@@ -41,6 +41,7 @@ def update_json_file(file_path, new_data):
         print(f"An error occurred: {e}")
 
 def on_item_click(self, item):
+    clear_window(self.main_deck_cards)
     if self.main_deck_card_count == 60:
             messagebox.showinfo("Main deck full", "You have reached the main deck card limit. Please either submit your deck or remove cards.")
     elif self.click_counts[item] == 3:
@@ -53,37 +54,41 @@ def on_item_click(self, item):
         self.item_dict.update({item: self.click_counts[item]})
         self.listbox.delete(0, tk.END)
         self.listbox.insert(0, 'Cards in deck: ' + str(self.main_deck_card_count))
-        try:
-            img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
-            photo = ImageTk.PhotoImage(img)
-        except FileNotFoundError:
-            print("Error: Image file not found.")
-            exit()
-        image_label = tk.Label(self.main_deck_cards, image=photo)
-        x = (self.main_deck_card_count - 1) * 110
-        y = 0
-        if self.main_deck_card_count / 12 > 1 and self.main_deck_card_count / 12 <= 2:
-            x = x - 1320
-            y = y + 159
-        elif self.main_deck_card_count  / 12 > 2 and self.main_deck_card_count  / 12 <= 3:
-            x = x - 1320*2
-            y = y + 159*2
-        elif self.main_deck_card_count  / 12 > 3 and self.main_deck_card_count  / 12 <= 4:
-            x = x - 1320*3
-            y = y + 159*3
-        elif self.main_deck_card_count  / 12 > 4 and self.main_deck_card_count  / 12 <= 5:
-            x = x - 1320*4
-            y = y + 159*4
-        elif self.main_deck_card_count  / 12 > 5:
-            x = x - 1320*5
-            y = y + 159*5
-        image_label.place(x=x, y=y)
-        image_label.image = photo
         for item in sorted(list(self.item_dict)):
             if self.click_counts[item] > 0:
                 self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
+        i = 0
+        for item in sorted(list(Counter(self.item_dict).elements())):
+            try:
+                img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
+                photo = ImageTk.PhotoImage(img)
+            except FileNotFoundError:
+                print("Error: Image file not found.")
+                exit()
+            image_label = tk.Label(self.main_deck_cards, image=photo)
+            x = i * 110
+            y = 0
+            if self.main_deck_card_count / 12 > 1 and self.main_deck_card_count / 12 <= 2:
+                x = x - 1320
+                y = y + 159
+            elif self.main_deck_card_count  / 12 > 2 and self.main_deck_card_count  / 12 <= 3:
+                x = x - 1320*2
+                y = y + 159*2
+            elif self.main_deck_card_count  / 12 > 3 and self.main_deck_card_count  / 12 <= 4:
+                x = x - 1320*3
+                y = y + 159*3
+            elif self.main_deck_card_count  / 12 > 4 and self.main_deck_card_count  / 12 <= 5:
+                x = x - 1320*4
+                y = y + 159*4
+            elif self.main_deck_card_count  / 12 > 5:
+                x = x - 1320*5
+                y = y + 159*5
+            image_label.place(x=x, y=y)
+            image_label.image = photo
+            i = i + 1
 
 def on_item_right_click(self, item):
+    clear_window(self.main_deck_cards)
     if self.click_counts[item] == 0:
             messagebox.showinfo("Card not in deck", "This card cannot be removed because it is not in your deck, already.")
     else:
@@ -97,12 +102,43 @@ def on_item_right_click(self, item):
         for item in sorted(list(self.item_dict)):
             if self.click_counts[item] > 0:
                 self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
+        i = 0
+        for item in sorted(list(Counter(self.item_dict).elements())):
+            try:
+                img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
+                photo = ImageTk.PhotoImage(img)
+            except FileNotFoundError:
+                print("Error: Image file not found.")
+                exit()
+            image_label = tk.Label(self.main_deck_cards, image=photo)
+            x = i * 110
+            y = 0
+            if self.main_deck_card_count / 12 > 1 and self.main_deck_card_count / 12 <= 2:
+                x = x - 1320
+                y = y + 159
+            elif self.main_deck_card_count  / 12 > 2 and self.main_deck_card_count  / 12 <= 3:
+                x = x - 1320*2
+                y = y + 159*2
+            elif self.main_deck_card_count  / 12 > 3 and self.main_deck_card_count  / 12 <= 4:
+                x = x - 1320*3
+                y = y + 159*3
+            elif self.main_deck_card_count  / 12 > 4 and self.main_deck_card_count  / 12 <= 5:
+                x = x - 1320*4
+                y = y + 159*4
+            elif self.main_deck_card_count  / 12 > 5:
+                x = x - 1320*5
+                y = y + 159*5
+            image_label.place(x=x, y=y)
+            image_label.image = photo
+            i = i + 1
 
 def clear_window(window_):
     for widget in window_.winfo_children():
         widget.pack_forget()
         widget.grid_forget()
         widget.place_forget()
+        if isinstance(widget, tk.Label):
+            widget.config(image='')
 
 def hide_button(self):
     self.pack_forget()
