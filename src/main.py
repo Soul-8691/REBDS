@@ -53,12 +53,38 @@ def on_item_click(self, item):
         self.item_dict.update({item: self.click_counts[item]})
         self.listbox.delete(0, tk.END)
         self.listbox.insert(0, 'Cards in deck: ' + str(self.main_deck_card_count))
+        try:
+            img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
+            photo = ImageTk.PhotoImage(img)
+        except FileNotFoundError:
+            print("Error: Image file not found.")
+            exit()
+        image_label = tk.Label(self.main_deck_cards, image=photo)
+        x = (self.main_deck_card_count - 1) * 110
+        y = 0
+        if self.main_deck_card_count / 12 > 1 and self.main_deck_card_count / 12 < 2:
+            x = x - 1320
+            y = y + 159
+        elif self.main_deck_card_count  / 12 > 2 and self.main_deck_card_count  / 12 < 3:
+            x = x - 1320*2
+            y = y + 159*2
+        elif self.main_deck_card_count  / 12 > 3 and self.main_deck_card_count  / 12 < 4:
+            x = x - 1320*3
+            y = y + 159*3
+        elif self.main_deck_card_count  / 12 > 4 and self.main_deck_card_count  / 12 < 5:
+            x = x - 1320*4
+            y = y + 159*4
+        elif self.main_deck_card_count  / 12 > 5:
+            x = x - 1320*5
+            y = y + 159*5
+        image_label.place(x=x, y=y)
+        image_label.image = photo
         for item in sorted(list(self.item_dict)):
             if self.click_counts[item] > 0:
                 self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
 
 def on_item_right_click(self, item):
-    if self.main_deck_card_count == 0:
+    if self.click_counts[item] == 0:
             messagebox.showinfo("Card not in deck", "This card cannot be removed because it is not in your deck, already.")
     else:
         self.click_counts[item] -= 1
@@ -87,9 +113,9 @@ def on_button_click(self):
     else:
         messagebox.showinfo("Deck submitted", "Your deck is legal! Deck submitted.")
 
+
 def onEnter(self, card_image, card_name):
     clear_window(card_image)
-    global img
     try:
         img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[card_name]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[card_name]) + '.jpg').resize((514, 750))
         photo = ImageTk.PhotoImage(img)
@@ -102,7 +128,6 @@ def onEnter(self, card_image, card_name):
 
 def onLeave(self, card_image, card_name):
     clear_window(card_image)
-    global img
     try:
         img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[card_name]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[card_name]) + '.jpg').resize((514, 750))
         photo = ImageTk.PhotoImage(img)
@@ -129,17 +154,19 @@ class VirtualListbox(tk.Canvas):
         self.main_deck_card_count = 0
         self.listbox_window = tk.Toplevel()
         self.listbox_window.title("Main deck")
-        self.listbox = tk.Listbox(self.listbox_window, width=100, height=35)
+        self.listbox = tk.Listbox(self.listbox_window, width=50, height=35)
         self.listbox.pack()
         self.item_dict = OrderedDict()
         self.card_image = tk.Toplevel()
         self.card_image.title("Card image")
+        self.main_deck_cards = tk.Toplevel()
+        self.main_deck_cards.title("Cards (main deck)")
         self.update_list()
 
     def update_list(self):
         self.delete("all")
         clear_window(self)
-        for i, item in enumerate(list(self.items)[self.viewable_start:self.viewable_start + self.num_visible]):
+        for i, item in enumerate(sorted(list(self.items))[self.viewable_start:self.viewable_start + self.num_visible]):
             y = i * self.item_height
             self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=''.join(e for e in item if e.isalnum()))
             self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-1>", lambda event, itm=item: on_item_click(self, itm))
