@@ -6,6 +6,8 @@
 # Be able to remove cards from deck
 # Be able to submit deck
 # Sort cards in deck alphabetically
+# Track number of cards in deck
+# Display card icons in deck list after selection
 # Game starts (pygame)
 # Cards slide into view
 # Cards displayed using pygame
@@ -47,8 +49,10 @@ def on_item_click(self, item):
         self.click_counts[item] += 1
         update_json_file('main_deck.json', {item: self.click_counts[item]})
         self.main_deck_card_count += 1
+        root.main_deck_card_count += 1
         self.item_dict.update({item: self.click_counts[item]})
         self.listbox.delete(0, tk.END)
+        self.listbox.insert(0, 'Cards in deck: ' + str(self.main_deck_card_count))
         for item in sorted(list(self.item_dict)):
             if self.click_counts[item] > 0:
                 self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
@@ -60,8 +64,10 @@ def on_item_right_click(self, item):
         self.click_counts[item] -= 1
         update_json_file('main_deck.json', {item: self.click_counts[item]})
         self.main_deck_card_count -= 1
+        root.main_deck_card_count -= 1
         self.item_dict.update({item: self.click_counts[item]})
         self.listbox.delete(0, tk.END)
+        self.listbox.insert(0, 'Cards in deck: ' + str(self.main_deck_card_count))
         for item in sorted(list(self.item_dict)):
             if self.click_counts[item] > 0:
                 self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
@@ -132,7 +138,7 @@ class VirtualListbox(tk.Canvas):
 
     def update_list(self):
         self.delete("all")
-        self.pack_forget()
+        clear_window(self)
         for i, item in enumerate(list(self.items)[self.viewable_start:self.viewable_start + self.num_visible]):
             y = i * self.item_height
             self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=''.join(e for e in item if e.isalnum()))
@@ -141,8 +147,6 @@ class VirtualListbox(tk.Canvas):
             self.tag_bind(''.join(e for e in item if e.isalnum()), '<Enter>', lambda event, itm=item: onEnter(self, self.card_image, itm))
             self.tag_bind(''.join(e for e in item if e.isalnum()), '<Leave>', lambda event, itm=item: onLeave(self, self.card_image, itm))
         self.config(scrollregion=(0, 0, 0, len(self.items) * self.item_height))
-        button = tk.Button(root, text="Submit main deck", command=partial(on_button_click, self))
-        button.pack()
 
     def yview(self, *args):
         if args:
@@ -161,6 +165,9 @@ if __name__ == '__main__':
     root = tk.Tk()
     root.title('Red-Eyes Black Duel Simulator')
     messagebox.showinfo("Main deck", "Construct a main deck consisting of 40-60 cards.")
+    root.main_deck_card_count = 0
+    button = tk.Button(root, text="Submit main deck", command=partial(on_button_click, root))
+    button.pack()
     card_info_data = open('src/YGOProDeck_Card_Info.json')
     card_info_data = json.load(card_info_data)
     items = {}
