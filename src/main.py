@@ -14,11 +14,13 @@
 # You can select your card
 # You have a list of actions to take upon selecting your card
 
+import sys, os
 import tkinter as tk
 import json
 from functools import partial
 from tkinter import messagebox
 from collections import OrderedDict
+from PIL import Image, ImageTk
 
 open('src/main_deck.json', 'w').close()
 
@@ -64,11 +66,46 @@ def on_item_right_click(self, item):
             if self.click_counts[item] > 0:
                 self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
 
+def clear_window(window_):
+    for widget in window_.winfo_children():
+        widget.pack_forget()
+        widget.grid_forget()
+        widget.place_forget()
+
+def hide_button(self):
+    self.pack_forget()
+
 def on_button_click(self):
     if self.main_deck_card_count < 40:
         messagebox.showinfo("Invalid deck size", "Your deck needs to consist of 40-60 cards.")
     else:
         messagebox.showinfo("Deck submitted", "Your deck is legal! Deck submitted.")
+
+def onEnter(self, card_image, card_name):
+    clear_window(card_image)
+    global img
+    try:
+        img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[card_name]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[card_name]) + '.jpg').resize((514, 750))
+        photo = ImageTk.PhotoImage(img)
+    except FileNotFoundError:
+        print("Error: Image file not found.")
+        exit()
+    image_label = tk.Label(card_image, image=photo)
+    image_label.pack()
+    image_label.image = photo
+
+def onLeave(self, card_image, card_name):
+    clear_window(card_image)
+    global img
+    try:
+        img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[card_name]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[card_name]) + '.jpg').resize((514, 750))
+        photo = ImageTk.PhotoImage(img)
+    except FileNotFoundError:
+        print("Error: Image file not found.")
+        exit()
+    image_label = tk.Label(card_image, image=photo)
+    image_label.pack()
+    image_label.image = photo
 
 class VirtualListbox(tk.Canvas):
     def __init__(self, master, items, **kwargs):
@@ -89,15 +126,20 @@ class VirtualListbox(tk.Canvas):
         self.listbox = tk.Listbox(self.listbox_window, width=100, height=35)
         self.listbox.pack()
         self.item_dict = OrderedDict()
+        self.card_image = tk.Toplevel()
+        self.card_image.title("Card image")
         self.update_list()
 
     def update_list(self):
         self.delete("all")
-        for i, item in enumerate(self.items[self.viewable_start:self.viewable_start + self.num_visible]):
+        self.pack_forget()
+        for i, item in enumerate(list(self.items)[self.viewable_start:self.viewable_start + self.num_visible]):
             y = i * self.item_height
             self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=''.join(e for e in item if e.isalnum()))
             self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-1>", lambda event, itm=item: on_item_click(self, itm))
             self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-3>", lambda event, itm=item: on_item_right_click(self, itm))
+            self.tag_bind(''.join(e for e in item if e.isalnum()), '<Enter>', lambda event, itm=item: onEnter(self, self.card_image, itm))
+            self.tag_bind(''.join(e for e in item if e.isalnum()), '<Leave>', lambda event, itm=item: onLeave(self, self.card_image, itm))
         self.config(scrollregion=(0, 0, 0, len(self.items) * self.item_height))
         button = tk.Button(root, text="Submit main deck", command=partial(on_button_click, self))
         button.pack()
@@ -121,13 +163,13 @@ if __name__ == '__main__':
     messagebox.showinfo("Main deck", "Construct a main deck consisting of 40-60 cards.")
     card_info_data = open('src/YGOProDeck_Card_Info.json')
     card_info_data = json.load(card_info_data)
-    items = []
+    items = {}
     for data in card_info_data['data']:
         card_name = data['name']
+        card_id = data['id']
         if card_name == '7':
             card_name = 'Seven'
-        items.append(card_name)
-    items = sorted(items)
+        items.update({card_name: card_id})
     virtual_listbox = VirtualListbox(root, items)
     virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
     root.mainloop()
