@@ -3,6 +3,8 @@
 # Choose your extra deck from a list of cards
 # Choose your side deck from a list of cards
 # Display currently selected cards in a list
+# Be able to remove cards from deck
+# Be able to submit deck
 # Game starts (pygame)
 # Cards slide into view
 # Cards displayed using pygame
@@ -17,7 +19,7 @@ from functools import partial
 from tkinter import messagebox
 from collections import OrderedDict
 
-open('main_deck.json', 'w').close()
+open('src/main_deck.json', 'w').close()
 
 def update_json_file(file_path, new_data):
     try:
@@ -45,7 +47,21 @@ def on_item_click(self, item):
         self.item_dict.update({item: self.click_counts[item]})
         self.listbox.delete(0, tk.END)
         for item in self.item_dict:
-            self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
+            if self.click_counts[item] > 0:
+                self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
+
+def on_item_right_click(self, item):
+    if self.main_deck_card_count == 0:
+            messagebox.showinfo("Card not in deck", "This card cannot be removed because it is not in your deck, already.")
+    else:
+        self.click_counts[item] -= 1
+        update_json_file('main_deck.json', {item: self.click_counts[item]})
+        self.main_deck_card_count -= 1
+        self.item_dict.update({item: self.click_counts[item]})
+        self.listbox.delete(0, tk.END)
+        for item in self.item_dict:
+            if self.click_counts[item] > 0:
+                self.listbox.insert(tk.END, item + ': ' + str(self.item_dict[item]))
 
 class VirtualListbox(tk.Canvas):
     def __init__(self, master, items, **kwargs):
@@ -74,6 +90,7 @@ class VirtualListbox(tk.Canvas):
             y = i * self.item_height
             self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=''.join(e for e in item if e.isalnum()))
             self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-1>", lambda event, itm=item: on_item_click(self, itm))
+            self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-3>", lambda event, itm=item: on_item_right_click(self, itm))
         self.config(scrollregion=(0, 0, 0, len(self.items) * self.item_height))
 
     def yview(self, *args):
