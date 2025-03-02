@@ -62,7 +62,7 @@ class VirtualListbox(tk.Canvas):
         self.viewable_start = 0
         self.main_deck_card_count = 0
         self.listbox_window = tk.Toplevel()
-        self.listbox_window.title("Separate Listbox")
+        self.listbox_window.title("Main deck")
         self.listbox = tk.Listbox(self.listbox_window, width=100, height=35)
         self.listbox.pack()
         self.item_dict = OrderedDict()
