@@ -62,7 +62,6 @@ def check(my_entry, items, e):
     # Give focus back to the entry box
     my_entry.focus_set()
 
-
 def update_json_file(file_path, new_data):
     try:
         with open(file_path, 'r+') as file:
@@ -521,8 +520,8 @@ def on_button_click_side_deck():
     export = messagebox.askyesno("Export to YDK?", "Do you want to export to YDK format?")
     if export:
         export_ = True
-        root.ydk_file_name = tk.Toplevel()
-        root.ydk_file_name.title("YDK file name")
+        root.ydk_stuff = tk.Toplevel()
+        root.ydk_stuff.title("YDK file name")
         file_name = tk.Label(root.ydk_file_name, text="Enter file name below.")
         file_name.pack()
         root.deck_var=tk.StringVar()
@@ -532,10 +531,22 @@ def on_button_click_side_deck():
         root.ydk.focus_force()
     if export_ == True:
         root.ydk.wait_window()
-    opp_deck = OptionDialog(root, "Opponent deck", "Do you want to construct your opponent's deck, or choose from a list of presets?", ['Construct', 'Choose preset'])
-    if opp_deck.result == 'Construct':
+    if root.opponent == False:
         root.opponent = True
-        main()
+        opp_deck = OptionDialog(root, "Opponent deck", "Do you want to construct your opponent's deck, or choose from a list of presets?", ['Construct', 'Choose preset'])
+        if opp_deck.result == 'Construct':
+            main()
+        if opp_deck.result == 'Choose preset':
+            root.ydk_stuff = tk.Toplevel()
+            root.ydk_stuff.title('Construct opponent deck')
+            opponent_decks = {'YK Vanilla UO Control': 'src/decks/ydk/YK Vanilla UO Control.ydk'}
+            root.virtual_listbox = VirtualListboxOpponentDecks(root.ydk_stuff, opponent_decks)
+            root.virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            root.ydk_stuff.wait_window()
+            root.construct = False
+            main()
+    else:
+        messagebox.showinfo('Duel started', 'The duel is ready to begin.')
 
 class OptionDialog(tk.Toplevel):
     """
@@ -623,6 +634,102 @@ def item_highlight(self, tag):
 
 def item_unhighlight(self, tag):
     self.itemconfig(tag, fill='black')  # Reset to default black color
+
+def on_item_click_opponent_deck(self, ydk_file_path):
+    try:
+        with open(ydk_file_path, "r", encoding='utf8') as ydk:
+            ydk_ = ydk.readlines()
+            main_deck = []
+            extra_deck = []
+            side_deck = []
+            main_deck_ = False
+            extra_deck_ = False
+            side_deck_ = False
+            for line in ydk_:
+                if line == '!side\n':
+                    side_deck_ = True
+                elif side_deck_ == True:
+                    side_deck.append(line.replace('\n', ''))
+                if line == '#extra\n':
+                    extra_deck_ = True
+                elif side_deck_ == False and extra_deck_ == True:
+                    extra_deck.append(line.replace('\n', ''))
+                if line == '#main\n':
+                    main_deck_ = True
+                elif main_deck_ == True and extra_deck_ == False:
+                    main_deck.append(line.replace('\n', ''))
+            for card_id in set(main_deck):
+                try:
+                    update_json_file('src/decks/main_deck_opponent.json', {root.items_by_id[int(card_id)]: Counter(main_deck)[card_id]})
+                    root.click_counts[root.items_by_id[int(card_id)]] += Counter(main_deck)[card_id]
+                    root.card_count += Counter(main_deck)[card_id]
+                    root.main_deck_card_count += Counter(main_deck)[card_id]
+                    root.item_dict.update({root.items_by_id[int(card_id)]: root.click_counts[root.items_by_id[int(card_id)]]})
+                except:
+                    print(card_id + ' is alt art. Please use the original.')
+            for card_id in set(extra_deck):
+                try:
+                    update_json_file('src/decks/extra_deck_opponent.json', {root.items_by_id[int(card_id)]: Counter(extra_deck)[card_id]})
+                    root.click_counts[root.items_by_id[int(card_id)]] += Counter(extra_deck)[card_id]
+                    root.extra_deck_click_counts[root.items_by_id[int(card_id)]] += Counter(extra_deck)[card_id]
+                    root.card_count += Counter(extra_deck)[card_id]
+                    root.extra_deck_card_count += Counter(extra_deck)[card_id]
+                    root.item_dict_extra_deck.update({root.items_by_id[int(card_id)]: root.click_counts[root.items_by_id[int(card_id)]]})
+                except:
+                    print(card_id + ' is alt art. Please use the original.')
+            for card_id in set(side_deck):
+                try:
+                    update_json_file('src/decks/side_deck_opponent.json', {root.items_by_id[int(card_id)]: Counter(side_deck)[card_id]})
+                    root.click_counts[root.items_by_id[int(card_id)]] += Counter(side_deck)[card_id]
+                    root.side_deck_click_counts[root.items_by_id[int(card_id)]] += Counter(side_deck)[card_id]
+                    root.card_count += Counter(side_deck)[card_id]
+                    root.side_deck_card_count += Counter(side_deck)[card_id]
+                    root.item_dict_side_deck.update({root.items_by_id[int(card_id)]: root.click_counts[root.items_by_id[int(card_id)]]})
+                except:
+                    print(card_id + ' is alt art. Please use the original.')
+            root.ydk_stuff.destroy()
+    except Exception as e:
+        print("Error opening YDK:", e)
+
+class VirtualListboxOpponentDecks(tk.Canvas):
+    def __init__(self, master, items, **kwargs):
+        super().__init__(master, **kwargs)
+        self.items = items
+        self.items_to_show = list(items)
+        self.num_visible = 30  # Number of items to display at once
+        self.item_height = 20
+        self.config(width=200, height=self.num_visible * self.item_height)
+        self.scroll_y = tk.Scrollbar(master, command=self.yview)
+        self.scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
+        self.config(yscrollcommand=self.scroll_y.set)
+        self.bind("<MouseWheel>", self.on_mousewheel)
+        self.viewable_start = 0
+        self.update_list()
+
+    def update_list(self):
+        self.delete("all")
+        clear_window(self)
+        for i, item in enumerate(sorted(self.items_to_show)[self.viewable_start:self.viewable_start + self.num_visible]):
+            y = i * self.item_height
+            tag = ''.join(e for e in item if e.isalnum())
+            self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=tag)
+            self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_opponent_deck(self, self.items[itm]))
+            self.tag_bind(tag, '<Enter>', lambda event, t=tag: item_highlight(self, t))
+            self.tag_bind(tag, '<Leave>', lambda event, t=tag: item_unhighlight(self, t))
+        self.config(scrollregion=(0, 0, 0, len(self.items_to_show) * self.item_height))
+
+    def yview(self, *args):
+        if args:
+            if args[0] == "moveto":
+                self.viewable_start = int(float(args[1]) * (len(self.items_to_show) - self.num_visible))
+            elif args[0] == "scroll":
+                delta = int(args[1])
+                self.viewable_start = max(0, min(self.viewable_start + delta, len(self.items_to_show) - self.num_visible))
+            self.update_list()
+            self.scroll_y.set(self.viewable_start / len(self.items_to_show), (self.viewable_start + self.num_visible) / len(self.items_to_show))
+
+    def on_mousewheel(self, event):
+         self.yview("scroll", -1 if event.delta > 0 else 1, "units")
 
 class VirtualListbox(tk.Canvas):
     def __init__(self, master, items, **kwargs):
@@ -753,36 +860,7 @@ class VirtualListboxExtraDeck(tk.Canvas):
     def on_mousewheel(self, event):
          self.yview("scroll", -1 if event.delta > 0 else 1, "units")
 
-def main():
-    root.title('Red-Eyes Black Duel Simulator')
-    root.item_dict = OrderedDict()
-    root.item_dict_extra_deck = OrderedDict()
-    root.item_dict_side_deck = OrderedDict()
-    root.card_count = 0
-    root.main_deck_card_count = 0
-    root.extra_deck_card_count = 0
-    root.side_deck_card_count = 0
-    card_info_data = open('src/YGOProDeck_Card_Info.json')
-    root.card_info_data = json.load(card_info_data)
-    root.items = {}
-    root.items_by_id = {}
-    items_to_display = {}
-    extra_deck_items = {}
-    for data in root.card_info_data['data']:
-        card_name = data['name']
-        card_id = data['id']
-        card_type = data['type']
-        if card_type != 'XYZ Monster' and card_type != 'Synchro Monster' and card_type != 'Fusion Monster':
-            if card_name == '7':
-                card_name = 'Seven'
-            items_to_display.update({card_name: card_id})
-        if card_type == 'XYZ Monster' or card_type == 'Synchro Monster' or card_type == 'Fusion Monster':
-            extra_deck_items.update({card_name: card_id})
-        root.items_by_id.update({card_id: card_name})
-        root.items.update({card_name: card_id})
-    root.click_counts = {item: 0 for item in root.items}
-    root.extra_deck_click_counts = {item: 0 for item in extra_deck_items}
-    root.side_deck_click_counts = {item: 0 for item in root.items}
+def construct():
     import_ = messagebox.askyesno("Import YDK?", "Do you want to import a YDK file?")
     if import_:
         ydk_file_path = filedialog.askopenfilename(
@@ -852,6 +930,38 @@ def main():
                             print(card_id + ' is alt art. Please use the original.')
             except Exception as e:
                 print("Error opening YDK:", e)
+
+def main():
+    root.item_dict = OrderedDict()
+    root.item_dict_extra_deck = OrderedDict()
+    root.item_dict_side_deck = OrderedDict()
+    root.card_count = 0
+    root.main_deck_card_count = 0
+    root.extra_deck_card_count = 0
+    root.side_deck_card_count = 0
+    card_info_data = open('src/YGOProDeck_Card_Info.json')
+    root.card_info_data = json.load(card_info_data)
+    root.items = {}
+    root.items_by_id = {}
+    items_to_display = {}
+    extra_deck_items = {}
+    for data in root.card_info_data['data']:
+        card_name = data['name']
+        card_id = data['id']
+        card_type = data['type']
+        if card_type != 'XYZ Monster' and card_type != 'Synchro Monster' and card_type != 'Fusion Monster':
+            if card_name == '7':
+                card_name = 'Seven'
+            items_to_display.update({card_name: card_id})
+        if card_type == 'XYZ Monster' or card_type == 'Synchro Monster' or card_type == 'Fusion Monster':
+            extra_deck_items.update({card_name: card_id})
+        root.items_by_id.update({card_id: card_name})
+        root.items.update({card_name: card_id})
+    root.click_counts = {item: 0 for item in root.items}
+    root.extra_deck_click_counts = {item: 0 for item in extra_deck_items}
+    root.side_deck_click_counts = {item: 0 for item in root.items}
+    if root.construct == True:
+        construct()
     messagebox.showinfo("Main deck", "Construct a main deck consisting of 40-60 cards.")
     button = tk.Button(root, text="Submit main deck", command=on_button_click)
     button.pack()
@@ -886,5 +996,7 @@ def main():
 
 if __name__ == '__main__':
     root = tk.Tk()
+    root.title('Red-Eyes Black Duel Simulator')
     root.opponent = False
+    root.construct = True
     main()
