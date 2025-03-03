@@ -27,6 +27,37 @@ from PIL import Image, ImageTk
 
 open('src/main_deck.json', 'w').close()
 
+# Update entry box with listbox clicked
+def fillout(my_entry, my_list, e):
+	# Delete whatever is in the entry box
+	my_entry.delete(0, tk.END)
+
+	# Add clicked list item to entry box
+	my_entry.insert(0, my_list.get(tk.ANCHOR))
+
+# Create function to check entry vs listbox
+def check(my_entry, items, e):
+    typed = my_entry.get()
+    root.card_var = typed
+
+    if typed == '':
+        filtered = list(items.keys())  # Show all items if search bar is empty
+    else:
+        filtered = [item for item in items.keys() if typed.lower() in item.lower()]
+
+    if filtered:
+        root.virtual_listbox.items = filtered
+        root.virtual_listbox.viewable_start = 0
+        root.virtual_listbox.update_list()
+        root.virtual_listbox.focus_set()  # Keep focus on the listbox
+    else:
+        root.virtual_listbox.items = list(items.keys())  # Reset if no match
+        root.virtual_listbox.update_list()
+
+    # Give focus back to the entry box
+    my_entry.focus_set()
+
+
 def update_json_file(file_path, new_data):
     try:
         with open(file_path, 'r+') as file:
@@ -241,6 +272,11 @@ if __name__ == '__main__':
     root.card_image.title("Card image")
     button4 = tk.Button(root, text="Show/hide card images", command=partial(toggle_toplevel, root.card_image))
     button4.pack()
+    root.card_var=tk.StringVar()
+    root.my_entry = tk.Entry(root, textvariable=root.card_var)
+    root.my_entry.pack()
+    root.my_entry.bind("<KeyRelease>", lambda e: check(root.my_entry, items, e))
+    root.my_entry.focus_force()
     root.card_image.withdraw()
     root.item_dict = OrderedDict()
     root.main_deck_card_count = 0
@@ -253,6 +289,6 @@ if __name__ == '__main__':
         if card_name == '7':
             card_name = 'Seven'
         items.update({card_name: card_id})
-    virtual_listbox = VirtualListbox(root, items)
-    virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    root.virtual_listbox = VirtualListbox(root, items)
+    root.virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
     root.mainloop()
