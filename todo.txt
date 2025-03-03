@@ -1,0 +1,4 @@
+Net play
+AI
+Choose opp deck
+Preset opp decks
