@@ -88,7 +88,7 @@ def game_loop(root):
 
     # Blit card backs
     for x in opponent_x_positions:
-        start_pos = (-110, opponent_y_position)
+        start_pos = (-100, opponent_y_position)
         end_pos = (x, opponent_y_position)
         slide_in_card(card_back_image, start_pos, end_pos, 500, drawn_cards, drawn_cards_backs)
     pygame.display.flip()

@@ -518,10 +518,7 @@ def construct_side_deck_menu(self):
     root.listbox_window.withdraw()
     root.card_image = tk.Toplevel()
     root.card_image.title("Card image")
-    if root.opponent == False:
-        button4 = tk.Button(root, text="Show/hide card images", command=lambda: toggle_toplevel(root.card_image))
-    else:
-        button4 = tk.Button(root, text="Show/hide opponent card images", command=lambda: toggle_toplevel(root.card_image))
+    button4 = tk.Button(root, text="Show/hide card images", command=lambda: toggle_toplevel(root.card_image))
     button4.pack()
     root.card_image.protocol("WM_DELETE_WINDOW", root.card_image.withdraw)
     if root.opponent == False:
@@ -588,10 +585,7 @@ def construct_extra_deck_menu(self):
     root.listbox_window.withdraw()
     root.card_image = tk.Toplevel()
     root.card_image.title("Card image")
-    if root.opponent == False:
-        button4 = tk.Button(root, text="Show/hide card images", command=lambda: toggle_toplevel(root.card_image))
-    else:
-        button4 = tk.Button(root, text="Show/hide opponent card images", command=lambda: toggle_toplevel(root.card_image))
+    button4 = tk.Button(root, text="Show/hide opponent card images", command=lambda: toggle_toplevel(root.card_image))
     button4.pack()
     root.card_image.protocol("WM_DELETE_WINDOW", root.card_image.withdraw)
     if root.opponent == False:
@@ -1103,10 +1097,7 @@ def main():
     root.listbox_window.withdraw()
     root.card_image = tk.Toplevel()
     root.card_image.title("Card image")
-    if root.opponent == False:
-        button4 = tk.Button(root, text="Show/hide card images", command=lambda: toggle_toplevel(root.card_image))
-    else:
-        button4 = tk.Button(root, text="Show/hide opponent card images", command=lambda: toggle_toplevel(root.card_image))
+    button4 = tk.Button(root, text="Show/hide card images", command=lambda: toggle_toplevel(root.card_image))
     button4.pack()
     root.card_image.protocol("WM_DELETE_WINDOW", root.card_image.withdraw)
     root.card_var=tk.StringVar()
@@ -1134,7 +1125,7 @@ def main():
             if root.side_deck_click_counts[item] > 0:
                 root.listbox.insert(tk.END, item + ': ' + str(root.item_dict_side_deck[item]))
     else:
-        root.listbox.insert(0, 'Cards in opponent main deck:' + str(root.main_deck_card_count_opponent))
+        root.listbox.insert(0, 'Cards in opponent main deck: ' + str(root.main_deck_card_count_opponent))
         for item in sorted(list(root.item_dict_opponent)):
             if root.click_counts_opponent[item] > 0:
                 root.listbox.insert(tk.END, item + ': ' + str(root.item_dict_opponent[item]))
