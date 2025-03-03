@@ -551,6 +551,12 @@ def onLeave(self, card_image, card_name):
     image_label.pack()
     image_label.image = photo
 
+def item_highlight(self, tag):
+    self.itemconfig(tag, fill='red')  # Highlight with yellow color
+
+def item_unhighlight(self, tag):
+    self.itemconfig(tag, fill='black')  # Reset to default black color
+
 class VirtualListbox(tk.Canvas):
     def __init__(self, master, items, **kwargs):
         super().__init__(master, **kwargs)
@@ -571,11 +577,14 @@ class VirtualListbox(tk.Canvas):
         clear_window(self)
         for i, item in enumerate(sorted(self.items_to_show)[self.viewable_start:self.viewable_start + self.num_visible]):
             y = i * self.item_height
-            self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=''.join(e for e in item if e.isalnum()))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-1>", lambda event, itm=item: on_item_click(self, itm))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-3>", lambda event, itm=item: on_item_right_click(self, itm))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
+            tag = ''.join(e for e in item if e.isalnum())
+            self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=tag)
+            self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click(self, itm))
+            self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click(self, itm))
+            self.tag_bind(tag, '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
+            self.tag_bind(tag, '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
+            self.tag_bind(tag, '<Enter>', lambda event, t=tag: item_highlight(self, t))
+            self.tag_bind(tag, '<Leave>', lambda event, t=tag: item_unhighlight(self, t))
         self.config(scrollregion=(0, 0, 0, len(self.items_to_show) * self.item_height))
 
     def yview(self, *args):
@@ -611,11 +620,14 @@ class VirtualListboxSideDeck(tk.Canvas):
         clear_window(self)
         for i, item in enumerate(sorted(self.items_to_show)[self.viewable_start:self.viewable_start + self.num_visible]):
             y = i * self.item_height
-            self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=''.join(e for e in item if e.isalnum()))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-1>", lambda event, itm=item: on_item_click_side_deck(self, itm))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-3>", lambda event, itm=item: on_item_right_click_side_deck(self, itm))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
+            tag = ''.join(e for e in item if e.isalnum())
+            self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=tag)
+            self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_side_deck(self, itm))
+            self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click_side_deck(self, itm))
+            self.tag_bind(tag, '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
+            self.tag_bind(tag, '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
+            self.tag_bind(tag, '<Enter>', lambda event, t=tag: item_highlight(self, t))
+            self.tag_bind(tag, '<Leave>', lambda event, t=tag: item_unhighlight(self, t))
         self.config(scrollregion=(0, 0, 0, len(self.items_to_show) * self.item_height))
 
     def yview(self, *args):
@@ -651,11 +663,14 @@ class VirtualListboxExtraDeck(tk.Canvas):
         clear_window(self)
         for i, item in enumerate(sorted(self.items_to_show)[self.viewable_start:self.viewable_start + self.num_visible]):
             y = i * self.item_height
-            self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=''.join(e for e in item if e.isalnum()))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-1>", lambda event, itm=item: on_item_click_extra_deck(self, itm))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-3>", lambda event, itm=item: on_item_right_click_extra_deck(self, itm))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
-            self.tag_bind(''.join(e for e in item if e.isalnum()), '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
+            tag = ''.join(e for e in item if e.isalnum())
+            self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=tag)
+            self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_extra_deck(self, itm))
+            self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click_extra_deck(self, itm))
+            self.tag_bind(tag, '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
+            self.tag_bind(tag, '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
+            self.tag_bind(tag, '<Enter>', lambda event, t=tag: item_highlight(self, t))
+            self.tag_bind(tag, '<Leave>', lambda event, t=tag: item_unhighlight(self, t))
         self.config(scrollregion=(0, 0, 0, len(self.items_to_show) * self.item_height))
 
     def yview(self, *args):
