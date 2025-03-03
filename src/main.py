@@ -46,12 +46,12 @@ def check(my_entry, items, e):
         filtered = [item for item in items.keys() if typed.lower() in item.lower()]
 
     if filtered:
-        root.virtual_listbox.items = filtered
+        root.virtual_listbox.items_to_show = filtered
         root.virtual_listbox.viewable_start = 0
         root.virtual_listbox.update_list()
         root.virtual_listbox.focus_set()  # Keep focus on the listbox
     else:
-        root.virtual_listbox.items = list(items.keys())  # Reset if no match
+        root.virtual_listbox.items_to_show = list(items.keys())  # Reset if no match
         root.virtual_listbox.update_list()
 
     # Give focus back to the entry box
@@ -183,6 +183,7 @@ def toggle_toplevel(toplevel):
     if toplevel.winfo_ismapped():
         toplevel.withdraw()  # Hide the window
     else:
+        toplevel.update()
         toplevel.deiconify() # Show the window
 
 def onEnter(self, card_image, card_name):
@@ -213,6 +214,7 @@ class VirtualListbox(tk.Canvas):
     def __init__(self, master, items, **kwargs):
         super().__init__(master, **kwargs)
         self.items = items
+        self.items_to_show = list(items)
         self.click_counts = {item: 0 for item in items}
         self.num_visible = 30  # Number of items to display at once
         self.item_height = 20
@@ -227,24 +229,24 @@ class VirtualListbox(tk.Canvas):
     def update_list(self):
         self.delete("all")
         clear_window(self)
-        for i, item in enumerate(sorted(list(self.items))[self.viewable_start:self.viewable_start + self.num_visible]):
+        for i, item in enumerate(sorted(self.items_to_show)[self.viewable_start:self.viewable_start + self.num_visible]):
             y = i * self.item_height
             self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=''.join(e for e in item if e.isalnum()))
             self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-1>", lambda event, itm=item: on_item_click(self, itm))
             self.tag_bind(''.join(e for e in item if e.isalnum()), "<Button-3>", lambda event, itm=item: on_item_right_click(self, itm))
             self.tag_bind(''.join(e for e in item if e.isalnum()), '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
             self.tag_bind(''.join(e for e in item if e.isalnum()), '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
-        self.config(scrollregion=(0, 0, 0, len(self.items) * self.item_height))
+        self.config(scrollregion=(0, 0, 0, len(self.items_to_show) * self.item_height))
 
     def yview(self, *args):
         if args:
             if args[0] == "moveto":
-                self.viewable_start = int(float(args[1]) * (len(self.items) - self.num_visible))
+                self.viewable_start = int(float(args[1]) * (len(self.items_to_show) - self.num_visible))
             elif args[0] == "scroll":
                 delta = int(args[1])
-                self.viewable_start = max(0, min(self.viewable_start + delta, len(self.items) - self.num_visible))
+                self.viewable_start = max(0, min(self.viewable_start + delta, len(self.items_to_show) - self.num_visible))
             self.update_list()
-            self.scroll_y.set(self.viewable_start / len(self.items), (self.viewable_start + self.num_visible) / len(self.items))
+            self.scroll_y.set(self.viewable_start / len(self.items_to_show), (self.viewable_start + self.num_visible) / len(self.items_to_show))
 
     def on_mousewheel(self, event):
          self.yview("scroll", -1 if event.delta > 0 else 1, "units")
@@ -259,18 +261,18 @@ if __name__ == '__main__':
     root.main_deck_cards = tk.Toplevel()
     root.main_deck_cards.title("Cards (main deck)")
     root.main_deck_cards.withdraw()
-    button2 = tk.Button(root, text="Show/hide main deck cards", command=partial(toggle_toplevel, root.main_deck_cards))
+    button2 = tk.Button(root, text="Show/hide main deck cards", command=lambda: toggle_toplevel(root.main_deck_cards))
     button2.pack()
     root.listbox_window = tk.Toplevel()
     root.listbox_window.title("Main deck")
     root.listbox = tk.Listbox(root.listbox_window, width=50, height=35)
     root.listbox.pack()
-    button3 = tk.Button(root, text="Show/hide main deck", command=partial(toggle_toplevel, root.listbox_window))
+    button3 = tk.Button(root, text="Show/hide main deck", command=lambda: toggle_toplevel(root.listbox_window))
     button3.pack()
     root.listbox_window.withdraw()
     root.card_image = tk.Toplevel()
     root.card_image.title("Card image")
-    button4 = tk.Button(root, text="Show/hide card images", command=partial(toggle_toplevel, root.card_image))
+    button4 = tk.Button(root, text="Show/hide card images", command=lambda: toggle_toplevel(root.card_image))
     button4.pack()
     root.card_var=tk.StringVar()
     root.my_entry = tk.Entry(root, textvariable=root.card_var)
