@@ -84,10 +84,7 @@ def on_item_click(self, item):
         messagebox.showinfo("Card limit reached", "You have reached the 3 card limit, already.")
     else:
         root.click_counts[item] += 1
-        if root.opponent == False:
-            update_json_file('src/decks/main_deck.json', {item: root.click_counts[item]})
-        else:
-            update_json_file('src/decks/main_deck_opponent.json', {item: root.click_counts[item]})
+        update_json_file('src/decks/main_deck.json', {item: root.click_counts[item]})
         root.card_count += 1
         root.main_deck_card_count += 1
         root.item_dict.update({item: root.click_counts[item]})
@@ -132,10 +129,7 @@ def on_item_right_click(self, item):
             messagebox.showinfo("Card not in deck", "This card cannot be removed because it is not in your deck, already.")
     else:
         root.click_counts[item] -= 1
-        if root.opponent == False:
-            update_json_file('src/decks/main_deck.json', {item: root.click_counts[item]})
-        else:
-            update_json_file('src/decks/main_deck_opponent.json', {item: root.click_counts[item]})
+        update_json_file('src/decks/main_deck.json', {item: root.click_counts[item]})
         root.card_count -= 1
         root.main_deck_card_count -= 1
         root.item_dict.update({item: root.click_counts[item]})
@@ -183,10 +177,7 @@ def on_item_click_side_deck(self, item):
     else:
         root.click_counts[item] += 1
         root.side_deck_click_counts[item] += 1
-        if root.opponent == False:
-            update_json_file('src/decks/side_deck.json', {item: root.side_deck_click_counts[item]})
-        else:
-            update_json_file('src/decks/side_deck_opponent.json', {item: root.side_deck_click_counts[item]})
+        update_json_file('src/decks/side_deck.json', {item: root.side_deck_click_counts[item]})
         root.side_deck_card_count += 1
         root.item_dict_side_deck.update({item: root.side_deck_click_counts[item]})
         root.listbox_side_deck.delete(0, tk.END)
@@ -239,10 +230,7 @@ def on_item_right_click_side_deck(self, item):
     else:
         root.click_counts[item] -= 1
         root.side_deck_click_counts[item] -= 1
-        if root.opponent == False:
-            update_json_file('src/decks/side_deck.json', {item: root.side_deck_click_counts[item]})
-        else:
-            update_json_file('src/decks/side_deck_opponent.json', {item: root.side_deck_click_counts[item]})
+        update_json_file('src/decks/side_deck.json', {item: root.side_deck_click_counts[item]})
         root.side_deck_card_count -= 1
         root.item_dict_side_deck.update({item: root.side_deck_click_counts[item]})
         root.listbox_side_deck.delete(0, tk.END)
@@ -297,10 +285,7 @@ def on_item_click_extra_deck(self, item):
     else:
         root.click_counts[item] += 1
         root.extra_deck_click_counts[item] += 1
-        if root.opponent == False:
-            update_json_file('src/decks/extra_deck.json', {item: root.extra_deck_click_counts[item]})
-        else:
-            update_json_file('src/decks/extra_deck_opponent.json', {item: root.extra_deck_click_counts[item]})
+        update_json_file('src/decks/extra_deck.json', {item: root.extra_deck_click_counts[item]})
         root.extra_deck_card_count += 1
         root.item_dict_extra_deck.update({item: root.extra_deck_click_counts[item]})
         root.listbox_extra_deck.delete(0, tk.END)
@@ -349,10 +334,7 @@ def on_item_right_click_extra_deck(self, item):
     else:
         root.click_counts[item] -= 1
         root.extra_deck_click_counts[item] -= 1
-        if root.opponent == False:
-            update_json_file('src/decks/extra_deck.json', {item: root.extra_deck_click_counts[item]})
-        else:
-            update_json_file('src/decks/extra_deck_opponent.json', {item: root.extra_deck_click_counts[item]})
+        update_json_file('src/decks/extra_deck.json', {item: root.extra_deck_click_counts[item]})
         root.extra_deck_card_count -= 1
         root.item_dict_extra_deck.update({item: root.extra_deck_click_counts[item]})
         root.listbox_extra_deck.delete(0, tk.END)
@@ -366,6 +348,306 @@ def on_item_right_click_extra_deck(self, item):
                 root.listbox_extra_deck.insert(tk.END, item + ': ' + str(root.item_dict_extra_deck[item]))
         i = 0
         for item in sorted(list(Counter(root.item_dict_extra_deck).elements())):
+            try:
+                img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
+                photo = ImageTk.PhotoImage(img)
+            except FileNotFoundError:
+                print("Error: Image file not found.")
+                exit()
+            image_label = tk.Label(root.extra_deck_cards, image=photo)
+            x = i * 110
+            y = 0
+            if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
+                x = x - 1320
+                y = y + 159
+            elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
+                x = x - 1320*2
+                y = y + 159*2
+            elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
+                x = x - 1320*3
+                y = y + 159*3
+            elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
+                x = x - 1320*4
+                y = y + 159*4
+            elif (i + 1)  / 12 > 5:
+                x = x - 1320*5
+                y = y + 159*5
+            image_label.place(x=x, y=y)
+            image_label.image = photo
+            i = i + 1
+
+def on_item_click_opponent(self, item):
+    clear_window(root.main_deck_cards)
+    if root.main_deck_card_count_opponent == 60:
+            messagebox.showinfo("Main deck full", "You have reached the main deck card limit. Please either submit your deck or remove cards.")
+    elif root.click_counts_opponent[item] == 3:
+        messagebox.showinfo("Card limit reached", "You have reached the 3 card limit, already.")
+    else:
+        root.click_counts_opponent[item] += 1
+        update_json_file('src/decks/main_deck_opponent.json', {item: root.click_counts_opponent[item]})
+        root.card_count_opponent += 1
+        root.main_deck_card_count_opponent += 1
+        root.item_dict_opponent.update({item: root.click_counts_opponent[item]})
+        root.listbox.delete(0, tk.END)
+        root.listbox.insert(0, 'Cards in deck: ' + str(root.main_deck_card_count_opponent))
+        for item in sorted(list(root.item_dict_opponent)):
+            if root.click_counts_opponent[item] > 0:
+                root.listbox.insert(tk.END, item + ': ' + str(root.item_dict_opponent[item]))
+    i = 0
+    for item in sorted(list(Counter(root.item_dict_opponent).elements())):
+        try:
+            img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
+            photo = ImageTk.PhotoImage(img)
+        except FileNotFoundError:
+            print("Error: Image file not found.")
+            exit()
+        image_label = tk.Label(root.main_deck_cards, image=photo)
+        x = i * 110
+        y = 0
+        if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
+            x = x - 1320
+            y = y + 159
+        elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
+            x = x - 1320*2
+            y = y + 159*2
+        elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
+            x = x - 1320*3
+            y = y + 159*3
+        elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
+            x = x - 1320*4
+            y = y + 159*4
+        elif (i + 1)  / 12 > 5:
+            x = x - 1320*5
+            y = y + 159*5
+        image_label.place(x=x, y=y)
+        image_label.image = photo
+        i = i + 1
+
+def on_item_right_click_opponent(self, item):
+    clear_window(root.main_deck_cards)
+    if root.click_counts_opponent[item] == 0:
+            messagebox.showinfo("Card not in deck", "This card cannot be removed because it is not in your deck, already.")
+    else:
+        root.click_counts_opponent[item] -= 1
+        update_json_file('src/decks/main_deck_opponent.json', {item: root.click_counts_opponent[item]})
+        root.card_count_opponent -= 1
+        root.main_deck_card_count_opponent -= 1
+        root.item_dict_opponent.update({item: root.click_counts_opponent[item]})
+        root.listbox.delete(0, tk.END)
+        root.listbox.insert(0, 'Cards in deck: ' + str(root.main_deck_card_count_opponent))
+        for item in sorted(list(root.item_dict_opponent)):
+            if root.click_counts_opponent[item] > 0:
+                root.listbox.insert(tk.END, item + ': ' + str(root.item_dict_opponent[item]))
+        i = 0
+        for item in sorted(list(Counter(root.item_dict_opponent).elements())):
+            try:
+                img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
+                photo = ImageTk.PhotoImage(img)
+            except FileNotFoundError:
+                print("Error: Image file not found.")
+                exit()
+            image_label = tk.Label(root.main_deck_cards, image=photo)
+            x = i * 110
+            y = 0
+            if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
+                x = x - 1320
+                y = y + 159
+            elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
+                x = x - 1320*2
+                y = y + 159*2
+            elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
+                x = x - 1320*3
+                y = y + 159*3
+            elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
+                x = x - 1320*4
+                y = y + 159*4
+            elif (i + 1)  / 12 > 5:
+                x = x - 1320*5
+                y = y + 159*5
+            image_label.place(x=x, y=y)
+            image_label.image = photo
+            i = i + 1
+
+def on_item_click_side_deck_opponent(self, item):
+    clear_window(root.side_deck_cards)
+    if root.side_deck_card_count_opponent == 15:
+            messagebox.showinfo("Side deck full", "You have reached the side deck card limit. Please either submit your side deck or remove cards.")
+    elif root.click_counts_opponent[item] == 3:
+        messagebox.showinfo("Card limit reached", "You have reached the 3 card limit, already.")
+    else:
+        root.click_counts_opponent[item] += 1
+        root.side_deck_click_counts_opponent[item] += 1
+        update_json_file('src/decks/side_deck_opponent.json', {item: root.side_deck_click_counts_opponent[item]})
+        root.side_deck_card_count_opponent += 1
+        root.item_dict_side_deck_opponent.update({item: root.side_deck_click_counts_opponent[item]})
+        root.listbox_side_deck.delete(0, tk.END)
+        root.listbox_side_deck.insert(0, 'Cards in main deck:')
+        for item in sorted(list(root.item_dict_opponent)):
+            if root.click_counts_opponent[item] > 0:
+                root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_opponent[item]))
+        root.listbox_side_deck.insert(tk.END, 'Cards in extra deck:')
+        for item in sorted(list(root.item_dict_extra_deck_opponent)):
+            if root.extra_deck_click_counts_opponent[item] > 0:
+                root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_extra_deck_opponent[item]))
+        root.listbox_side_deck.insert(tk.END, 'Cards in side deck: ' + str(root.side_deck_card_count_opponent))
+        for item in sorted(list(root.item_dict_side_deck_opponent)):
+            if root.side_deck_click_counts_opponent[item] > 0:
+                root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_side_deck_opponent[item]))
+    i = 0
+    for item in sorted(list(Counter(root.item_dict_side_deck_opponent).elements())):
+        try:
+            img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
+            photo = ImageTk.PhotoImage(img)
+        except FileNotFoundError:
+            print("Error: Image file not found.")
+            exit()
+        image_label = tk.Label(root.side_deck_cards, image=photo)
+        x = i * 110
+        y = 0
+        if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
+            x = x - 1320
+            y = y + 159
+        elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
+            x = x - 1320*2
+            y = y + 159*2
+        elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
+            x = x - 1320*3
+            y = y + 159*3
+        elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
+            x = x - 1320*4
+            y = y + 159*4
+        elif (i + 1)  / 12 > 5:
+            x = x - 1320*5
+            y = y + 159*5
+        image_label.place(x=x, y=y)
+        image_label.image = photo
+        i = i + 1
+
+def on_item_right_click_side_deck_opponent(self, item):
+    clear_window(root.side_deck_cards)
+    if root.side_deck_click_counts_opponent[item] == 0:
+            messagebox.showinfo("Card not in deck", "This card cannot be removed because it is not in your side deck, already.")
+    else:
+        root.click_counts_opponent[item] -= 1
+        root.side_deck_click_counts_opponent[item] -= 1
+        update_json_file('src/decks/side_deck_opponent.json', {item: root.side_deck_click_counts_opponent[item]})
+        root.side_deck_card_count_opponent -= 1
+        root.item_dict_side_deck_opponent.update({item: root.side_deck_click_counts_opponent[item]})
+        root.listbox_side_deck.delete(0, tk.END)
+        root.listbox_side_deck.insert(0, 'Cards in main deck:')
+        for item in sorted(list(root.item_dict_opponent)):
+            if root.click_counts_opponent[item] > 0:
+                root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_opponent[item]))
+        root.listbox_side_deck.insert(tk.END, 'Cards in extra deck:')
+        for item in sorted(list(root.item_dict_extra_deck_opponent)):
+            if root.extra_deck_click_counts_opponent[item] > 0:
+                root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_extra_deck_opponent[item]))
+        root.listbox_side_deck.insert(tk.END, 'Cards in side deck: ' + str(root.side_deck_card_count_opponent))
+        for item in sorted(list(root.item_dict_side_deck_opponent)):
+            if root.side_deck_click_counts_opponent[item] > 0:
+                root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_side_deck_opponent[item]))
+        i = 0
+        for item in sorted(list(Counter(root.item_dict_side_deck_opponent).elements())):
+            try:
+                img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
+                photo = ImageTk.PhotoImage(img)
+            except FileNotFoundError:
+                print("Error: Image file not found.")
+                exit()
+            image_label = tk.Label(root.side_deck_cards, image=photo)
+            x = i * 110
+            y = 0
+            if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
+                x = x - 1320
+                y = y + 159
+            elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
+                x = x - 1320*2
+                y = y + 159*2
+            elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
+                x = x - 1320*3
+                y = y + 159*3
+            elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
+                x = x - 1320*4
+                y = y + 159*4
+            elif (i + 1)  / 12 > 5:
+                x = x - 1320*5
+                y = y + 159*5
+            image_label.place(x=x, y=y)
+            image_label.image = photo
+            i = i + 1
+
+def on_item_click_extra_deck_opponent(self, item):
+    clear_window(root.extra_deck_cards)
+    if root.extra_deck_card_count_opponent == 15:
+            messagebox.showinfo("Extra deck full", "You have reached the extra deck card limit. Please either submit your extra deck or remove cards.")
+    elif root.click_counts_opponent[item] == 3:
+        messagebox.showinfo("Card limit reached", "You have reached the 3 card limit, already.")
+    else:
+        root.click_counts_opponent[item] += 1
+        root.extra_deck_click_counts_opponent[item] += 1
+        update_json_file('src/decks/extra_deck_opponent.json', {item: root.extra_deck_click_counts_opponent[item]})
+        root.extra_deck_card_count_opponent += 1
+        root.item_dict_extra_deck_opponent.update({item: root.extra_deck_click_counts_opponent[item]})
+        root.listbox_extra_deck.delete(0, tk.END)
+        root.listbox_extra_deck.insert(0, 'Cards in main deck:')
+        for item in sorted(list(root.item_dict_opponent)):
+            if root.click_counts_opponent[item] > 0:
+                root.listbox_extra_deck.insert(tk.END, item + ': ' + str(root.item_dict_opponent[item]))
+        root.listbox_extra_deck.insert(tk.END, 'Cards in extra deck: ' + str(root.extra_deck_card_count_opponent))
+        for item in sorted(list(root.item_dict_extra_deck_opponent)):
+            if root.extra_deck_click_counts_opponent[item] > 0:
+                root.listbox_extra_deck.insert(tk.END, item + ': ' + str(root.item_dict_extra_deck_opponent[item]))
+    i = 0
+    for item in sorted(list(Counter(root.item_dict_extra_deck_opponent).elements())):
+        try:
+            img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
+            photo = ImageTk.PhotoImage(img)
+        except FileNotFoundError:
+            print("Error: Image file not found.")
+            exit()
+        image_label = tk.Label(root.extra_deck_cards, image=photo)
+        x = i * 110
+        y = 0
+        if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
+            x = x - 1320
+            y = y + 159
+        elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
+            x = x - 1320*2
+            y = y + 159*2
+        elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
+            x = x - 1320*3
+            y = y + 159*3
+        elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
+            x = x - 1320*4
+            y = y + 159*4
+        elif (i + 1)  / 12 > 5:
+            x = x - 1320*5
+            y = y + 159*5
+        image_label.place(x=x, y=y)
+        image_label.image = photo
+        i = i + 1
+
+def on_item_right_click_extra_deck_opponent(self, item):
+    clear_window(root.extra_deck_cards)
+    if root.extra_deck_click_counts_opponent[item] == 0:
+            messagebox.showinfo("Card not in deck", "This card cannot be removed because it is not in your extra deck, already.")
+    else:
+        root.click_counts_opponent[item] -= 1
+        root.extra_deck_click_counts_opponent[item] -= 1
+        update_json_file('src/decks/extra_deck_opponent.json', {item: root.extra_deck_click_counts_opponent[item]})
+        root.extra_deck_card_count_opponent -= 1
+        root.item_dict_extra_deck_opponent.update({item: root.extra_deck_click_counts_opponent[item]})
+        root.listbox_extra_deck.delete(0, tk.END)
+        root.listbox_extra_deck.insert(0, 'Cards in main deck:')
+        for item in sorted(list(root.item_dict_opponent)):
+            if root.click_counts_opponent[item] > 0:
+                root.listbox_extra_deck.insert(tk.END, item + ': ' + str(root.item_dict_opponent[item]))
+        root.listbox_extra_deck.insert(tk.END, 'Cards in extra deck: ' + str(root.extra_deck_card_count_opponent))
+        for item in sorted(list(root.item_dict_extra_deck_opponent)):
+            if root.extra_deck_click_counts_opponent[item] > 0:
+                root.listbox_extra_deck.insert(tk.END, item + ': ' + str(root.item_dict_extra_deck_opponent[item]))
+        i = 0
+        for item in sorted(list(Counter(root.item_dict_extra_deck_opponent).elements())):
             try:
                 img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
                 photo = ImageTk.PhotoImage(img)
@@ -522,10 +804,10 @@ def on_button_click_side_deck():
         export_ = True
         root.ydk_stuff = tk.Toplevel()
         root.ydk_stuff.title("YDK file name")
-        file_name = tk.Label(root.ydk_file_name, text="Enter file name below.")
+        file_name = tk.Label(root.ydk_stuff, text="Enter file name below.")
         file_name.pack()
         root.deck_var=tk.StringVar()
-        root.ydk = tk.Entry(root.ydk_file_name, textvariable=root.deck_var)
+        root.ydk = tk.Entry(root.ydk_stuff, textvariable=root.deck_var)
         root.ydk.pack()
         root.ydk.bind("<Return>", on_enter)
         root.ydk.focus_force()
@@ -661,30 +943,30 @@ def on_item_click_opponent_deck(self, ydk_file_path):
             for card_id in set(main_deck):
                 try:
                     update_json_file('src/decks/main_deck_opponent.json', {root.items_by_id[int(card_id)]: Counter(main_deck)[card_id]})
-                    root.click_counts[root.items_by_id[int(card_id)]] += Counter(main_deck)[card_id]
-                    root.card_count += Counter(main_deck)[card_id]
-                    root.main_deck_card_count += Counter(main_deck)[card_id]
-                    root.item_dict.update({root.items_by_id[int(card_id)]: root.click_counts[root.items_by_id[int(card_id)]]})
+                    root.click_counts_opponent[root.items_by_id[int(card_id)]] += Counter(main_deck)[card_id]
+                    root.card_count_opponent += Counter(main_deck)[card_id]
+                    root.main_deck_card_count_opponent += Counter(main_deck)[card_id]
+                    root.item_dict_opponent.update({root.items_by_id[int(card_id)]: root.click_counts_opponent[root.items_by_id[int(card_id)]]})
                 except:
                     print(card_id + ' is alt art. Please use the original.')
             for card_id in set(extra_deck):
                 try:
                     update_json_file('src/decks/extra_deck_opponent.json', {root.items_by_id[int(card_id)]: Counter(extra_deck)[card_id]})
-                    root.click_counts[root.items_by_id[int(card_id)]] += Counter(extra_deck)[card_id]
-                    root.extra_deck_click_counts[root.items_by_id[int(card_id)]] += Counter(extra_deck)[card_id]
-                    root.card_count += Counter(extra_deck)[card_id]
-                    root.extra_deck_card_count += Counter(extra_deck)[card_id]
-                    root.item_dict_extra_deck.update({root.items_by_id[int(card_id)]: root.click_counts[root.items_by_id[int(card_id)]]})
+                    root.click_counts_opponent[root.items_by_id[int(card_id)]] += Counter(extra_deck)[card_id]
+                    root.extra_deck_click_counts_opponent[root.items_by_id[int(card_id)]] += Counter(extra_deck)[card_id]
+                    root.card_count_opponent += Counter(extra_deck)[card_id]
+                    root.extra_deck_card_count_opponent += Counter(extra_deck)[card_id]
+                    root.item_dict_extra_deck_opponent.update({root.items_by_id[int(card_id)]: root.click_counts_opponent[root.items_by_id[int(card_id)]]})
                 except:
                     print(card_id + ' is alt art. Please use the original.')
             for card_id in set(side_deck):
                 try:
                     update_json_file('src/decks/side_deck_opponent.json', {root.items_by_id[int(card_id)]: Counter(side_deck)[card_id]})
-                    root.click_counts[root.items_by_id[int(card_id)]] += Counter(side_deck)[card_id]
-                    root.side_deck_click_counts[root.items_by_id[int(card_id)]] += Counter(side_deck)[card_id]
-                    root.card_count += Counter(side_deck)[card_id]
-                    root.side_deck_card_count += Counter(side_deck)[card_id]
-                    root.item_dict_side_deck.update({root.items_by_id[int(card_id)]: root.click_counts[root.items_by_id[int(card_id)]]})
+                    root.click_counts_opponent[root.items_by_id[int(card_id)]] += Counter(side_deck)[card_id]
+                    root.side_deck_click_counts_opponent[root.items_by_id[int(card_id)]] += Counter(side_deck)[card_id]
+                    root.card_count_opponent += Counter(side_deck)[card_id]
+                    root.side_deck_card_count_opponent += Counter(side_deck)[card_id]
+                    root.item_dict_side_deck_opponent.update({root.items_by_id[int(card_id)]: root.click_counts_opponent[root.items_by_id[int(card_id)]]})
                 except:
                     print(card_id + ' is alt art. Please use the original.')
             root.ydk_stuff.destroy()
@@ -753,8 +1035,12 @@ class VirtualListbox(tk.Canvas):
             y = i * self.item_height
             tag = ''.join(e for e in item if e.isalnum())
             self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=tag)
-            self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click(self, itm))
-            self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click(self, itm))
+            if root.opponent == False:
+                self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click(self, itm))
+                self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click(self, itm))
+            else:
+                self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_opponent(self, itm))
+                self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click_opponent(self, itm))
             self.tag_bind(tag, '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
             self.tag_bind(tag, '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
             self.tag_bind(tag, '<Enter>', lambda event, t=tag: item_highlight(self, t))
@@ -796,8 +1082,12 @@ class VirtualListboxSideDeck(tk.Canvas):
             y = i * self.item_height
             tag = ''.join(e for e in item if e.isalnum())
             self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=tag)
-            self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_side_deck(self, itm))
-            self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click_side_deck(self, itm))
+            if root.opponent == False:
+                self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_side_deck(self, itm))
+                self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click_side_deck(self, itm))
+            else:
+                self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_side_deck_opponent(self, itm))
+                self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click_side_deck_opponent(self, itm))
             self.tag_bind(tag, '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
             self.tag_bind(tag, '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
             self.tag_bind(tag, '<Enter>', lambda event, t=tag: item_highlight(self, t))
@@ -839,8 +1129,12 @@ class VirtualListboxExtraDeck(tk.Canvas):
             y = i * self.item_height
             tag = ''.join(e for e in item if e.isalnum())
             self.create_text(10, y + self.item_height // 2, text=item, anchor=tk.W, tags=tag)
-            self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_extra_deck(self, itm))
-            self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click_extra_deck(self, itm))
+            if root.opponent == False:
+                self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_extra_deck(self, itm))
+                self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click_extra_deck(self, itm))
+            else:
+                self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_extra_deck_opponent(self, itm))
+                self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click_extra_deck_opponent(self, itm))
             self.tag_bind(tag, '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
             self.tag_bind(tag, '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
             self.tag_bind(tag, '<Enter>', lambda event, t=tag: item_highlight(self, t))
@@ -894,12 +1188,16 @@ def construct():
                         try:
                             if root.opponent == False:
                                 update_json_file('src/decks/main_deck.json', {root.items_by_id[int(card_id)]: Counter(main_deck)[card_id]})
+                                root.click_counts[root.items_by_id[int(card_id)]] += Counter(main_deck)[card_id]
+                                root.card_count += Counter(main_deck)[card_id]
+                                root.main_deck_card_count += Counter(main_deck)[card_id]
+                                root.item_dict.update({root.items_by_id[int(card_id)]: root.click_counts[root.items_by_id[int(card_id)]]})
                             else:
                                 update_json_file('src/decks/main_deck_opponent.json', {root.items_by_id[int(card_id)]: Counter(main_deck)[card_id]})
-                            root.click_counts[root.items_by_id[int(card_id)]] += Counter(main_deck)[card_id]
-                            root.card_count += Counter(main_deck)[card_id]
-                            root.main_deck_card_count += Counter(main_deck)[card_id]
-                            root.item_dict.update({root.items_by_id[int(card_id)]: root.click_counts[root.items_by_id[int(card_id)]]})
+                                root.click_counts_opponent[root.items_by_id[int(card_id)]] += Counter(main_deck)[card_id]
+                                root.card_count_opponent += Counter(main_deck)[card_id]
+                                root.main_deck_card_count_opponent += Counter(main_deck)[card_id]
+                                root.item_dict_opponent.update({root.items_by_id[int(card_id)]: root.click_counts_opponent[root.items_by_id[int(card_id)]]})
                         except:
                             print(card_id + ' is alt art. Please use the original.')
                     for card_id in set(extra_deck):
@@ -932,34 +1230,6 @@ def construct():
                 print("Error opening YDK:", e)
 
 def main():
-    root.item_dict = OrderedDict()
-    root.item_dict_extra_deck = OrderedDict()
-    root.item_dict_side_deck = OrderedDict()
-    root.card_count = 0
-    root.main_deck_card_count = 0
-    root.extra_deck_card_count = 0
-    root.side_deck_card_count = 0
-    card_info_data = open('src/YGOProDeck_Card_Info.json')
-    root.card_info_data = json.load(card_info_data)
-    root.items = {}
-    root.items_by_id = {}
-    items_to_display = {}
-    extra_deck_items = {}
-    for data in root.card_info_data['data']:
-        card_name = data['name']
-        card_id = data['id']
-        card_type = data['type']
-        if card_type != 'XYZ Monster' and card_type != 'Synchro Monster' and card_type != 'Fusion Monster':
-            if card_name == '7':
-                card_name = 'Seven'
-            items_to_display.update({card_name: card_id})
-        if card_type == 'XYZ Monster' or card_type == 'Synchro Monster' or card_type == 'Fusion Monster':
-            extra_deck_items.update({card_name: card_id})
-        root.items_by_id.update({card_id: card_name})
-        root.items.update({card_name: card_id})
-    root.click_counts = {item: 0 for item in root.items}
-    root.extra_deck_click_counts = {item: 0 for item in extra_deck_items}
-    root.side_deck_click_counts = {item: 0 for item in root.items}
     if root.construct == True:
         construct()
     messagebox.showinfo("Main deck", "Construct a main deck consisting of 40-60 cards.")
@@ -999,4 +1269,42 @@ if __name__ == '__main__':
     root.title('Red-Eyes Black Duel Simulator')
     root.opponent = False
     root.construct = True
+    root.item_dict = OrderedDict()
+    root.item_dict_extra_deck = OrderedDict()
+    root.item_dict_side_deck = OrderedDict()
+    root.item_dict_opponent = OrderedDict()
+    root.item_dict_extra_deck_opponent = OrderedDict()
+    root.item_dict_side_deck_opponent = OrderedDict()
+    root.card_count = 0
+    root.main_deck_card_count = 0
+    root.extra_deck_card_count = 0
+    root.side_deck_card_count = 0
+    root.card_count_opponent = 0
+    root.main_deck_card_count_opponent = 0
+    root.extra_deck_card_count_opponent = 0
+    root.side_deck_card_count_opponent = 0
+    card_info_data = open('src/YGOProDeck_Card_Info.json')
+    root.card_info_data = json.load(card_info_data)
+    root.items = {}
+    root.items_by_id = {}
+    items_to_display = {}
+    extra_deck_items = {}
+    for data in root.card_info_data['data']:
+        card_name = data['name']
+        card_id = data['id']
+        card_type = data['type']
+        if card_type != 'XYZ Monster' and card_type != 'Synchro Monster' and card_type != 'Fusion Monster':
+            if card_name == '7':
+                card_name = 'Seven'
+            items_to_display.update({card_name: card_id})
+        if card_type == 'XYZ Monster' or card_type == 'Synchro Monster' or card_type == 'Fusion Monster':
+            extra_deck_items.update({card_name: card_id})
+        root.items_by_id.update({card_id: card_name})
+        root.items.update({card_name: card_id})
+    root.click_counts = {item: 0 for item in root.items}
+    root.extra_deck_click_counts = {item: 0 for item in extra_deck_items}
+    root.side_deck_click_counts = {item: 0 for item in root.items}
+    root.click_counts_opponent = {item: 0 for item in root.items}
+    root.extra_deck_click_counts_opponent = {item: 0 for item in extra_deck_items}
+    root.side_deck_click_counts_opponent = {item: 0 for item in root.items}
     main()
