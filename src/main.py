@@ -21,7 +21,7 @@ import sys, os
 import tkinter as tk
 import json
 from functools import partial
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from collections import OrderedDict, Counter
 from PIL import Image, ImageTk
 
@@ -689,6 +689,68 @@ class VirtualListboxExtraDeck(tk.Canvas):
 if __name__ == '__main__':
     root = tk.Tk()
     root.title('Red-Eyes Black Duel Simulator')
+    root.item_dict = OrderedDict()
+    card_info_data = open('src/YGOProDeck_Card_Info.json')
+    root.card_info_data = json.load(card_info_data)
+    root.items = {}
+    root.items_by_id = {}
+    items_to_display = {}
+    for data in root.card_info_data['data']:
+        card_name = data['name']
+        card_id = data['id']
+        card_type = data['type']
+        if card_type != 'XYZ Monster' and card_type != 'Synchro Monster' and card_type != 'Fusion Monster':
+            if card_name == '7':
+                card_name = 'Seven'
+            items_to_display.update({card_name: card_id})
+        root.items_by_id.update({card_id: card_name})
+        root.items.update({card_name: card_id})
+    import_ = messagebox.askyesno("Import YDK?", "Do you want to import a YDK file?")
+    if import_:
+        ydk_file_path = filedialog.askopenfilename(
+            title="Select YDK File",
+            filetypes=[("YGO YDK Files", "*.ydk"), ("All Files", "*.*")]
+        )
+        if ydk_file_path:
+            try:
+                with open(ydk_file_path, "r", encoding='utf8') as ydk:
+                    ydk_ = ydk.readlines()
+                    main_deck = []
+                    extra_deck = []
+                    side_deck = []
+                    main_deck_ = False
+                    extra_deck_ = False
+                    side_deck_ = False
+                    for line in ydk_:
+                        if line == '!side\n':
+                            side_deck_ = True
+                        elif side_deck_ == True:
+                            side_deck.append(line)
+                        if line == '#extra\n':
+                            extra_deck_ = True
+                        elif side_deck_ == False and extra_deck_ == True:
+                            extra_deck.append(line.replace('\n', ''))
+                        if line == '#main\n':
+                            main_deck_ = True
+                        elif main_deck_ == True and extra_deck_ == False:
+                            main_deck.append(line.replace('\n', ''))
+                    for card_id in set(main_deck):
+                        try:
+                            update_json_file('src/main_deck.json', {root.items_by_id[int(card_id)]: Counter(main_deck)[card_id]})
+                        except:
+                            print(card_id + ' is alt art. Please use the original.')
+                    for card_id in set(extra_deck):
+                        try:
+                            update_json_file('src/extra_deck.json', {root.items_by_id[int(card_id)]: Counter(extra_deck)[card_id]})
+                        except:
+                            print(card_id + ' is alt art. Please use the original.')
+                    for card_id in set(side_deck):
+                        try:
+                            update_json_file('src/side_deck.json', {root.items_by_id[int(card_id)]: Counter(side_deck)[card_id]})
+                        except:
+                            print(card_id + ' is alt art. Please use the original.')
+            except Exception as e:
+                print("Error opening YDK:", e)
     messagebox.showinfo("Main deck", "Construct a main deck consisting of 40-60 cards.")
     root.card_count = 0
     button = tk.Button(root, text="Submit main deck", command=on_button_click)
@@ -716,20 +778,6 @@ if __name__ == '__main__':
     root.my_entry = tk.Entry(root, textvariable=root.card_var)
     root.my_entry.pack()
     root.card_image.withdraw()
-    root.item_dict = OrderedDict()
-    card_info_data = open('src/YGOProDeck_Card_Info.json')
-    root.card_info_data = json.load(card_info_data)
-    root.items = {}
-    items_to_display = {}
-    for data in root.card_info_data['data']:
-        card_name = data['name']
-        card_id = data['id']
-        card_type = data['type']
-        if card_type != 'XYZ Monster' and card_type != 'Synchro Monster' and card_type != 'Fusion Monster':
-            if card_name == '7':
-                card_name = 'Seven'
-            items_to_display.update({card_name: card_id})
-        root.items.update({card_name: card_id})
     root.my_entry.bind("<KeyRelease>", lambda e: check(root.my_entry, items_to_display, e))
     root.my_entry.focus_force()
     root.click_counts = {item: 0 for item in root.items}
