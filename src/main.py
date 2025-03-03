@@ -76,7 +76,7 @@ def update_json_file(file_path, new_data):
 
 def on_item_click(self, item):
     clear_window(root.main_deck_cards)
-    if root.card_count == 60:
+    if root.main_deck_card_count == 60:
             messagebox.showinfo("Main deck full", "You have reached the main deck card limit. Please either submit your deck or remove cards.")
     elif root.click_counts[item] == 3:
         messagebox.showinfo("Card limit reached", "You have reached the 3 card limit, already.")
@@ -84,9 +84,10 @@ def on_item_click(self, item):
         root.click_counts[item] += 1
         update_json_file('src/main_deck.json', {item: root.click_counts[item]})
         root.card_count += 1
+        root.main_deck_card_count += 1
         root.item_dict.update({item: root.click_counts[item]})
         root.listbox.delete(0, tk.END)
-        root.listbox.insert(0, 'Cards in deck: ' + str(root.card_count))
+        root.listbox.insert(0, 'Cards in deck: ' + str(root.main_deck_card_count))
         for item in sorted(list(root.item_dict)):
             if root.click_counts[item] > 0:
                 root.listbox.insert(tk.END, item + ': ' + str(root.item_dict[item]))
@@ -128,9 +129,10 @@ def on_item_right_click(self, item):
         root.click_counts[item] -= 1
         update_json_file('src/main_deck.json', {item: root.click_counts[item]})
         root.card_count -= 1
+        root.main_deck_card_count -= 1
         root.item_dict.update({item: root.click_counts[item]})
         root.listbox.delete(0, tk.END)
-        root.listbox.insert(0, 'Cards in deck: ' + str(root.card_count))
+        root.listbox.insert(0, 'Cards in deck: ' + str(root.main_deck_card_count))
         for item in sorted(list(root.item_dict)):
             if root.click_counts[item] > 0:
                 root.listbox.insert(tk.END, item + ': ' + str(root.item_dict[item]))
@@ -228,7 +230,7 @@ def on_item_right_click_side_deck(self, item):
         root.side_deck_click_counts[item] -= 1
         update_json_file('src/side_deck.json', {item: root.click_counts[item]})
         root.side_deck_card_count -= 1
-        root.item_dict_side_deck.update({item: root.click_counts_side_deck[item]})
+        root.item_dict_side_deck.update({item: root.side_deck_click_counts[item]})
         root.listbox_side_deck.delete(0, tk.END)
         root.listbox_side_deck.insert(0, 'Cards in main deck:')
         for item in sorted(list(root.item_dict)):
@@ -240,7 +242,7 @@ def on_item_right_click_side_deck(self, item):
                 root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_extra_deck[item]))
         root.listbox_side_deck.insert(tk.END, 'Cards in side deck: ' + str(root.side_deck_card_count))
         for item in sorted(list(root.item_dict_side_deck)):
-            if root.click_counts_side_deck[item] > 0:
+            if root.side_deck_click_counts[item] > 0:
                 root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_side_deck[item]))
         i = 0
         for item in sorted(list(Counter(root.item_dict_side_deck).elements())):
@@ -332,7 +334,7 @@ def on_item_right_click_extra_deck(self, item):
         root.extra_deck_click_counts[item] -= 1
         update_json_file('src/extra_deck.json', {item: root.click_counts[item]})
         root.extra_deck_card_count -= 1
-        root.item_dict_extra_deck.update({item: root.click_counts_extra_deck[item]})
+        root.item_dict_extra_deck.update({item: root.extra_deck_click_counts[item]})
         root.listbox_extra_deck.delete(0, tk.END)
         root.listbox_extra_deck.insert(0, 'Cards in main deck:')
         for item in sorted(list(root.item_dict)):
@@ -340,7 +342,7 @@ def on_item_right_click_extra_deck(self, item):
                 root.listbox_extra_deck.insert(tk.END, item + ': ' + str(root.item_dict[item]))
         root.listbox_extra_deck.insert(tk.END, 'Cards in extra deck: ' + str(root.extra_deck_card_count))
         for item in sorted(list(root.item_dict_extra_deck)):
-            if root.click_counts_extra_deck[item] > 0:
+            if root.extra_deck_click_counts[item] > 0:
                 root.listbox_extra_deck.insert(tk.END, item + ': ' + str(root.item_dict_extra_deck[item]))
         i = 0
         for item in sorted(list(Counter(root.item_dict_extra_deck).elements())):
@@ -388,7 +390,6 @@ def clear_window(window_):
 
 def construct_side_deck_menu(self):
     messagebox.showinfo("Side deck", "Construct a side deck consisting of 0-15 cards.")
-    root.side_deck_card_count = 0
     button = tk.Button(root, text="Submit side deck", command=on_button_click_side_deck)
     button.pack()
     root.side_deck_cards = tk.Toplevel()
@@ -420,7 +421,6 @@ def construct_side_deck_menu(self):
     root.my_entry.bind("<KeyRelease>", lambda e: check(root.my_entry, items, e))
     root.my_entry.focus_force()
     root.card_image.withdraw()
-    root.item_dict_side_deck = OrderedDict()
     items = {}
     for data in root.card_info_data['data']:
         card_name = data['name']
@@ -430,13 +430,11 @@ def construct_side_deck_menu(self):
             if card_name == '7':
                 card_name = 'Seven'
             items.update({card_name: card_id})
-    root.side_deck_click_counts = {item: 0 for item in items}
     root.virtual_listbox = VirtualListboxSideDeck(root, items)
     root.virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
 def construct_extra_deck_menu(self):
     messagebox.showinfo("Extra deck", "Construct a extra deck consisting of 0-15 cards.")
-    root.extra_deck_card_count = 0
     button = tk.Button(root, text="Submit extra deck", command=on_button_click_extra_deck)
     button.pack()
     root.extra_deck_cards = tk.Toplevel()
@@ -466,7 +464,6 @@ def construct_extra_deck_menu(self):
     root.my_entry.bind("<KeyRelease>", lambda e: check(root.my_entry, items, e))
     root.my_entry.focus_force()
     root.card_image.withdraw()
-    root.item_dict_extra_deck = OrderedDict()
     items = {}
     for data in root.card_info_data['data']:
         card_name = data['name']
@@ -474,7 +471,6 @@ def construct_extra_deck_menu(self):
         card_type = data['type']
         if card_type == 'XYZ Monster' or card_type == 'Synchro Monster' or card_type == 'Fusion Monster':
             items.update({card_name: card_id})
-    root.extra_deck_click_counts = {item: 0 for item in items}
     root.virtual_listbox = VirtualListboxExtraDeck(root, items)
     root.virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
@@ -482,7 +478,7 @@ def hide_button(self):
     self.pack_forget()
 
 def on_button_click():
-    if root.card_count < 1:
+    if root.main_deck_card_count < 1:
         messagebox.showinfo("Invalid deck size", "Your deck needs to consist of 40-60 cards.")
     else:
         messagebox.showinfo("Deck submitted", "Your deck is legal! Deck submitted.")
@@ -690,11 +686,18 @@ if __name__ == '__main__':
     root = tk.Tk()
     root.title('Red-Eyes Black Duel Simulator')
     root.item_dict = OrderedDict()
+    root.item_dict_extra_deck = OrderedDict()
+    root.item_dict_side_deck = OrderedDict()
+    root.card_count = 0
+    root.main_deck_card_count = 0
+    root.extra_deck_card_count = 0
+    root.side_deck_card_count = 0
     card_info_data = open('src/YGOProDeck_Card_Info.json')
     root.card_info_data = json.load(card_info_data)
     root.items = {}
     root.items_by_id = {}
     items_to_display = {}
+    extra_deck_items = {}
     for data in root.card_info_data['data']:
         card_name = data['name']
         card_id = data['id']
@@ -703,8 +706,13 @@ if __name__ == '__main__':
             if card_name == '7':
                 card_name = 'Seven'
             items_to_display.update({card_name: card_id})
+        if card_type == 'XYZ Monster' or card_type == 'Synchro Monster' or card_type == 'Fusion Monster':
+            extra_deck_items.update({card_name: card_id})
         root.items_by_id.update({card_id: card_name})
         root.items.update({card_name: card_id})
+    root.click_counts = {item: 0 for item in root.items}
+    root.extra_deck_click_counts = {item: 0 for item in extra_deck_items}
+    root.side_deck_click_counts = {item: 0 for item in root.items}
     import_ = messagebox.askyesno("Import YDK?", "Do you want to import a YDK file?")
     if import_:
         ydk_file_path = filedialog.askopenfilename(
@@ -725,7 +733,7 @@ if __name__ == '__main__':
                         if line == '!side\n':
                             side_deck_ = True
                         elif side_deck_ == True:
-                            side_deck.append(line)
+                            side_deck.append(line.replace('\n', ''))
                         if line == '#extra\n':
                             extra_deck_ = True
                         elif side_deck_ == False and extra_deck_ == True:
@@ -737,22 +745,35 @@ if __name__ == '__main__':
                     for card_id in set(main_deck):
                         try:
                             update_json_file('src/main_deck.json', {root.items_by_id[int(card_id)]: Counter(main_deck)[card_id]})
+                            root.click_counts[root.items_by_id[int(card_id)]] += Counter(main_deck)[card_id]
+                            root.card_count += Counter(main_deck)[card_id]
+                            root.main_deck_card_count += Counter(main_deck)[card_id]
+                            root.item_dict.update({root.items_by_id[int(card_id)]: root.click_counts[root.items_by_id[int(card_id)]]})
                         except:
                             print(card_id + ' is alt art. Please use the original.')
                     for card_id in set(extra_deck):
                         try:
                             update_json_file('src/extra_deck.json', {root.items_by_id[int(card_id)]: Counter(extra_deck)[card_id]})
+                            root.click_counts[root.items_by_id[int(card_id)]] += Counter(extra_deck)[card_id]
+                            root.extra_deck_click_counts[root.items_by_id[int(card_id)]] += Counter(extra_deck)[card_id]
+                            root.card_count += Counter(extra_deck)[card_id]
+                            root.extra_deck_card_count += Counter(extra_deck)[card_id]
+                            root.item_dict_extra_deck.update({root.items_by_id[int(card_id)]: root.click_counts[root.items_by_id[int(card_id)]]})
                         except:
                             print(card_id + ' is alt art. Please use the original.')
                     for card_id in set(side_deck):
                         try:
                             update_json_file('src/side_deck.json', {root.items_by_id[int(card_id)]: Counter(side_deck)[card_id]})
+                            root.click_counts[root.items_by_id[int(card_id)]] += Counter(side_deck)[card_id]
+                            root.side_deck_click_counts[root.items_by_id[int(card_id)]] += Counter(side_deck)[card_id]
+                            root.card_count += Counter(side_deck)[card_id]
+                            root.side_deck_card_count += Counter(side_deck)[card_id]
+                            root.item_dict_side_deck.update({root.items_by_id[int(card_id)]: root.click_counts[root.items_by_id[int(card_id)]]})
                         except:
                             print(card_id + ' is alt art. Please use the original.')
             except Exception as e:
                 print("Error opening YDK:", e)
     messagebox.showinfo("Main deck", "Construct a main deck consisting of 40-60 cards.")
-    root.card_count = 0
     button = tk.Button(root, text="Submit main deck", command=on_button_click)
     button.pack()
     root.main_deck_cards = tk.Toplevel()
@@ -780,7 +801,6 @@ if __name__ == '__main__':
     root.card_image.withdraw()
     root.my_entry.bind("<KeyRelease>", lambda e: check(root.my_entry, items_to_display, e))
     root.my_entry.focus_force()
-    root.click_counts = {item: 0 for item in root.items}
     root.virtual_listbox = VirtualListbox(root, items_to_display)
     root.virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
     root.mainloop()
