@@ -28,6 +28,9 @@ from PIL import Image, ImageTk
 open('src/decks/main_deck.json', 'w').close()
 open('src/decks/extra_deck.json', 'w').close()
 open('src/decks/side_deck.json', 'w').close()
+open('src/decks/main_deck_opponent.json', 'w').close()
+open('src/decks/extra_deck_opponent.json', 'w').close()
+open('src/decks/side_deck_opponent.json', 'w').close()
 
 # Update entry box with listbox clicked
 def fillout(my_entry, my_list, e):
@@ -82,7 +85,10 @@ def on_item_click(self, item):
         messagebox.showinfo("Card limit reached", "You have reached the 3 card limit, already.")
     else:
         root.click_counts[item] += 1
-        update_json_file('src/decks/main_deck.json', {item: root.click_counts[item]})
+        if root.opponent == False:
+            update_json_file('src/decks/main_deck.json', {item: root.click_counts[item]})
+        else:
+            update_json_file('src/decks/main_deck_opponent.json', {item: root.click_counts[item]})
         root.card_count += 1
         root.main_deck_card_count += 1
         root.item_dict.update({item: root.click_counts[item]})
@@ -127,7 +133,10 @@ def on_item_right_click(self, item):
             messagebox.showinfo("Card not in deck", "This card cannot be removed because it is not in your deck, already.")
     else:
         root.click_counts[item] -= 1
-        update_json_file('src/decks/main_deck.json', {item: root.click_counts[item]})
+        if root.opponent == False:
+            update_json_file('src/decks/main_deck.json', {item: root.click_counts[item]})
+        else:
+            update_json_file('src/decks/main_deck_opponent.json', {item: root.click_counts[item]})
         root.card_count -= 1
         root.main_deck_card_count -= 1
         root.item_dict.update({item: root.click_counts[item]})
@@ -175,7 +184,10 @@ def on_item_click_side_deck(self, item):
     else:
         root.click_counts[item] += 1
         root.side_deck_click_counts[item] += 1
-        update_json_file('src/decks/side_deck.json', {item: root.click_counts[item]})
+        if root.opponent == False:
+            update_json_file('src/decks/side_deck.json', {item: root.side_deck_click_counts[item]})
+        else:
+            update_json_file('src/decks/side_deck_opponent.json', {item: root.side_deck_click_counts[item]})
         root.side_deck_card_count += 1
         root.item_dict_side_deck.update({item: root.side_deck_click_counts[item]})
         root.listbox_side_deck.delete(0, tk.END)
@@ -228,7 +240,10 @@ def on_item_right_click_side_deck(self, item):
     else:
         root.click_counts[item] -= 1
         root.side_deck_click_counts[item] -= 1
-        update_json_file('src/decks/side_deck.json', {item: root.click_counts[item]})
+        if root.opponent == False:
+            update_json_file('src/decks/side_deck.json', {item: root.side_deck_click_counts[item]})
+        else:
+            update_json_file('src/decks/side_deck_opponent.json', {item: root.side_deck_click_counts[item]})
         root.side_deck_card_count -= 1
         root.item_dict_side_deck.update({item: root.side_deck_click_counts[item]})
         root.listbox_side_deck.delete(0, tk.END)
@@ -283,7 +298,10 @@ def on_item_click_extra_deck(self, item):
     else:
         root.click_counts[item] += 1
         root.extra_deck_click_counts[item] += 1
-        update_json_file('src/decks/extra_deck.json', {item: root.click_counts[item]})
+        if root.opponent == False:
+            update_json_file('src/decks/extra_deck.json', {item: root.extra_deck_click_counts[item]})
+        else:
+            update_json_file('src/decks/extra_deck_opponent.json', {item: root.extra_deck_click_counts[item]})
         root.extra_deck_card_count += 1
         root.item_dict_extra_deck.update({item: root.extra_deck_click_counts[item]})
         root.listbox_extra_deck.delete(0, tk.END)
@@ -332,7 +350,10 @@ def on_item_right_click_extra_deck(self, item):
     else:
         root.click_counts[item] -= 1
         root.extra_deck_click_counts[item] -= 1
-        update_json_file('src/decks/extra_deck.json', {item: root.click_counts[item]})
+        if root.opponent == False:
+            update_json_file('src/decks/extra_deck.json', {item: root.extra_deck_click_counts[item]})
+        else:
+            update_json_file('src/decks/extra_deck_opponent.json', {item: root.extra_deck_click_counts[item]})
         root.extra_deck_card_count -= 1
         root.item_dict_extra_deck.update({item: root.extra_deck_click_counts[item]})
         root.listbox_extra_deck.delete(0, tk.END)
@@ -496,13 +517,14 @@ def on_button_click_side_deck():
     messagebox.showinfo("Side deck submitted", "Your deck is legal! Deck submitted.")
     clear_window(root)
     clear_top_level(root)
+    export_ = False
     export = messagebox.askyesno("Export to YDK?", "Do you want to export to YDK format?")
     if export:
         export_ = True
         root.ydk_file_name = tk.Toplevel()
         root.ydk_file_name.title("YDK file name")
-        root.file_name = tk.Label(root.ydk_file_name, text="Enter file name below.")
-        root.file_name.pack()
+        file_name = tk.Label(root.ydk_file_name, text="Enter file name below.")
+        file_name.pack()
         root.deck_var=tk.StringVar()
         root.ydk = tk.Entry(root.ydk_file_name, textvariable=root.deck_var)
         root.ydk.pack()
@@ -511,7 +533,9 @@ def on_button_click_side_deck():
     if export_ == True:
         root.ydk.wait_window()
     opp_deck = OptionDialog(root, "Opponent deck", "Do you want to construct your opponent's deck, or choose from a list of presets?", ['Construct', 'Choose preset'])
-    print(opp_deck.result)
+    if opp_deck.result == 'Construct':
+        root.opponent = True
+        main()
 
 class OptionDialog(tk.Toplevel):
     """
@@ -729,8 +753,7 @@ class VirtualListboxExtraDeck(tk.Canvas):
     def on_mousewheel(self, event):
          self.yview("scroll", -1 if event.delta > 0 else 1, "units")
 
-if __name__ == '__main__':
-    root = tk.Tk()
+def main():
     root.title('Red-Eyes Black Duel Simulator')
     root.item_dict = OrderedDict()
     root.item_dict_extra_deck = OrderedDict()
@@ -791,7 +814,10 @@ if __name__ == '__main__':
                             main_deck.append(line.replace('\n', ''))
                     for card_id in set(main_deck):
                         try:
-                            update_json_file('src/decks/main_deck.json', {root.items_by_id[int(card_id)]: Counter(main_deck)[card_id]})
+                            if root.opponent == False:
+                                update_json_file('src/decks/main_deck.json', {root.items_by_id[int(card_id)]: Counter(main_deck)[card_id]})
+                            else:
+                                update_json_file('src/decks/main_deck_opponent.json', {root.items_by_id[int(card_id)]: Counter(main_deck)[card_id]})
                             root.click_counts[root.items_by_id[int(card_id)]] += Counter(main_deck)[card_id]
                             root.card_count += Counter(main_deck)[card_id]
                             root.main_deck_card_count += Counter(main_deck)[card_id]
@@ -800,7 +826,10 @@ if __name__ == '__main__':
                             print(card_id + ' is alt art. Please use the original.')
                     for card_id in set(extra_deck):
                         try:
-                            update_json_file('src/decks/extra_deck.json', {root.items_by_id[int(card_id)]: Counter(extra_deck)[card_id]})
+                            if root.opponent == False:
+                                update_json_file('src/decks/extra_deck.json', {root.items_by_id[int(card_id)]: Counter(extra_deck)[card_id]})
+                            else:
+                                update_json_file('src/decks/extra_deck_opponent.json', {root.items_by_id[int(card_id)]: Counter(extra_deck)[card_id]})
                             root.click_counts[root.items_by_id[int(card_id)]] += Counter(extra_deck)[card_id]
                             root.extra_deck_click_counts[root.items_by_id[int(card_id)]] += Counter(extra_deck)[card_id]
                             root.card_count += Counter(extra_deck)[card_id]
@@ -810,7 +839,10 @@ if __name__ == '__main__':
                             print(card_id + ' is alt art. Please use the original.')
                     for card_id in set(side_deck):
                         try:
-                            update_json_file('src/decks/side_deck.json', {root.items_by_id[int(card_id)]: Counter(side_deck)[card_id]})
+                            if root.opponent == False:
+                                update_json_file('src/decks/side_deck.json', {root.items_by_id[int(card_id)]: Counter(side_deck)[card_id]})
+                            else:
+                                update_json_file('src/decks/side_deck_opponent.json', {root.items_by_id[int(card_id)]: Counter(side_deck)[card_id]})
                             root.click_counts[root.items_by_id[int(card_id)]] += Counter(side_deck)[card_id]
                             root.side_deck_click_counts[root.items_by_id[int(card_id)]] += Counter(side_deck)[card_id]
                             root.card_count += Counter(side_deck)[card_id]
@@ -851,3 +883,8 @@ if __name__ == '__main__':
     root.virtual_listbox = VirtualListbox(root, items_to_display)
     root.virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
     root.mainloop()
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    root.opponent = False
+    main()
