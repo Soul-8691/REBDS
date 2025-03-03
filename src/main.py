@@ -90,35 +90,35 @@ def on_item_click(self, item):
         for item in sorted(list(root.item_dict)):
             if root.click_counts[item] > 0:
                 root.listbox.insert(tk.END, item + ': ' + str(root.item_dict[item]))
-        i = 0
-        for item in sorted(list(Counter(root.item_dict).elements())):
-            try:
-                img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
-                photo = ImageTk.PhotoImage(img)
-            except FileNotFoundError:
-                print("Error: Image file not found.")
-                exit()
-            image_label = tk.Label(root.main_deck_cards, image=photo)
-            x = i * 110
-            y = 0
-            if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
-                x = x - 1320
-                y = y + 159
-            elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
-                x = x - 1320*2
-                y = y + 159*2
-            elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
-                x = x - 1320*3
-                y = y + 159*3
-            elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
-                x = x - 1320*4
-                y = y + 159*4
-            elif (i + 1)  / 12 > 5:
-                x = x - 1320*5
-                y = y + 159*5
-            image_label.place(x=x, y=y)
-            image_label.image = photo
-            i = i + 1
+    i = 0
+    for item in sorted(list(Counter(root.item_dict).elements())):
+        try:
+            img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
+            photo = ImageTk.PhotoImage(img)
+        except FileNotFoundError:
+            print("Error: Image file not found.")
+            exit()
+        image_label = tk.Label(root.main_deck_cards, image=photo)
+        x = i * 110
+        y = 0
+        if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
+            x = x - 1320
+            y = y + 159
+        elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
+            x = x - 1320*2
+            y = y + 159*2
+        elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
+            x = x - 1320*3
+            y = y + 159*3
+        elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
+            x = x - 1320*4
+            y = y + 159*4
+        elif (i + 1)  / 12 > 5:
+            x = x - 1320*5
+            y = y + 159*5
+        image_label.place(x=x, y=y)
+        image_label.image = photo
+        i = i + 1
 
 def on_item_right_click(self, item):
     clear_window(root.main_deck_cards)
@@ -189,35 +189,35 @@ def on_item_click_side_deck(self, item):
         for item in sorted(list(root.item_dict_side_deck)):
             if root.side_deck_click_counts[item] > 0:
                 root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_side_deck[item]))
-        i = 0
-        for item in sorted(list(Counter(root.item_dict_side_deck).elements())):
-            try:
-                img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
-                photo = ImageTk.PhotoImage(img)
-            except FileNotFoundError:
-                print("Error: Image file not found.")
-                exit()
-            image_label = tk.Label(root.side_deck_cards, image=photo)
-            x = i * 110
-            y = 0
-            if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
-                x = x - 1320
-                y = y + 159
-            elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
-                x = x - 1320*2
-                y = y + 159*2
-            elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
-                x = x - 1320*3
-                y = y + 159*3
-            elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
-                x = x - 1320*4
-                y = y + 159*4
-            elif (i + 1)  / 12 > 5:
-                x = x - 1320*5
-                y = y + 159*5
-            image_label.place(x=x, y=y)
-            image_label.image = photo
-            i = i + 1
+    i = 0
+    for item in sorted(list(Counter(root.item_dict_side_deck).elements())):
+        try:
+            img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
+            photo = ImageTk.PhotoImage(img)
+        except FileNotFoundError:
+            print("Error: Image file not found.")
+            exit()
+        image_label = tk.Label(root.side_deck_cards, image=photo)
+        x = i * 110
+        y = 0
+        if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
+            x = x - 1320
+            y = y + 159
+        elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
+            x = x - 1320*2
+            y = y + 159*2
+        elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
+            x = x - 1320*3
+            y = y + 159*3
+        elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
+            x = x - 1320*4
+            y = y + 159*4
+        elif (i + 1)  / 12 > 5:
+            x = x - 1320*5
+            y = y + 159*5
+        image_label.place(x=x, y=y)
+        image_label.image = photo
+        i = i + 1
 
 def on_item_right_click_side_deck(self, item):
     clear_window(root.side_deck_cards)
@@ -293,35 +293,35 @@ def on_item_click_extra_deck(self, item):
         for item in sorted(list(root.item_dict_extra_deck)):
             if root.extra_deck_click_counts[item] > 0:
                 root.listbox_extra_deck.insert(tk.END, item + ': ' + str(root.item_dict_extra_deck[item]))
-        i = 0
-        for item in sorted(list(Counter(root.item_dict_extra_deck).elements())):
-            try:
-                img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
-                photo = ImageTk.PhotoImage(img)
-            except FileNotFoundError:
-                print("Error: Image file not found.")
-                exit()
-            image_label = tk.Label(root.extra_deck_cards, image=photo)
-            x = i * 110
-            y = 0
-            if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
-                x = x - 1320
-                y = y + 159
-            elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
-                x = x - 1320*2
-                y = y + 159*2
-            elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
-                x = x - 1320*3
-                y = y + 159*3
-            elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
-                x = x - 1320*4
-                y = y + 159*4
-            elif (i + 1)  / 12 > 5:
-                x = x - 1320*5
-                y = y + 159*5
-            image_label.place(x=x, y=y)
-            image_label.image = photo
-            i = i + 1
+    i = 0
+    for item in sorted(list(Counter(root.item_dict_extra_deck).elements())):
+        try:
+            img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[item]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[item]) + '.jpg').resize((110, 159))
+            photo = ImageTk.PhotoImage(img)
+        except FileNotFoundError:
+            print("Error: Image file not found.")
+            exit()
+        image_label = tk.Label(root.extra_deck_cards, image=photo)
+        x = i * 110
+        y = 0
+        if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
+            x = x - 1320
+            y = y + 159
+        elif (i + 1)  / 12 > 2 and (i + 1)  / 12 <= 3:
+            x = x - 1320*2
+            y = y + 159*2
+        elif (i + 1)  / 12 > 3 and (i + 1)  / 12 <= 4:
+            x = x - 1320*3
+            y = y + 159*3
+        elif (i + 1)  / 12 > 4 and (i + 1)  / 12 <= 5:
+            x = x - 1320*4
+            y = y + 159*4
+        elif (i + 1)  / 12 > 5:
+            x = x - 1320*5
+            y = y + 159*5
+        image_label.place(x=x, y=y)
+        image_label.image = photo
+        i = i + 1
 
 def on_item_right_click_extra_deck(self, item):
     clear_window(root.extra_deck_cards)
