@@ -164,7 +164,7 @@ def on_item_right_click(self, item):
 
 def on_item_click_side_deck(self, item):
     clear_window(root.side_deck_cards)
-    if root.card_count == 15:
+    if root.side_deck_card_count == 15:
             messagebox.showinfo("Side deck full", "You have reached the side deck card limit. Please either submit your side deck or remove cards.")
     elif root.click_counts[item] == 3:
         messagebox.showinfo("Card limit reached", "You have reached the 3 card limit, already.")
@@ -172,15 +172,14 @@ def on_item_click_side_deck(self, item):
         root.click_counts[item] += 1
         root.side_deck_click_counts[item] += 1
         update_json_file('src/main_deck.json', {item: root.click_counts[item]})
-        root.card_count += 1
         root.side_deck_card_count += 1
         root.item_dict.update({item: root.click_counts[item]})
         root.item_dict_side_deck.update({item: root.side_deck_click_counts[item]})
-        root.listbox_side_decK.delete(0, tk.END)
-        root.listbox_side_decK.insert(0, 'Cards in side deck: ' + str(root.side_deck_card_count))
+        root.listbox_side_deck.delete(0, tk.END)
+        root.listbox_side_deck.insert(0, 'Cards in side deck: ' + str(root.side_deck_card_count))
         for item in sorted(list(root.item_dict_side_deck)):
             if root.side_deck_click_counts[item] > 0:
-                root.listbox_side_decK.insert(tk.END, item + ': ' + str(root.item_dict_side_deck[item]))
+                root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_side_deck[item]))
         i = 0
         for item in sorted(list(Counter(root.item_dict_side_deck).elements())):
             try:
@@ -189,7 +188,7 @@ def on_item_click_side_deck(self, item):
             except FileNotFoundError:
                 print("Error: Image file not found.")
                 exit()
-            image_label = tk.Label(root.main_deck_cards, image=photo)
+            image_label = tk.Label(root.side_deck_cards, image=photo)
             x = i * 110
             y = 0
             if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
@@ -219,15 +218,14 @@ def on_item_right_click_side_deck(self, item):
         root.click_counts[item] -= 1
         root.side_deck_click_counts[item] -= 1
         update_json_file('src/main_deck.json', {item: root.click_counts[item]})
-        root.card_count -= 1
         root.side_deck_card_count -= 1
         root.item_dict.update({item: root.click_counts[item]})
         root.item_dict_side_deck.update({item: root.click_counts_side_deck[item]})
-        root.listbox_side_decK.delete(0, tk.END)
-        root.listbox_side_decK.insert(0, 'Cards in side deck: ' + str(root.side_deck_card_count))
+        root.listbox_side_deck.delete(0, tk.END)
+        root.listbox_side_deck.insert(0, 'Cards in side deck: ' + str(root.side_deck_card_count))
         for item in sorted(list(root.item_dict_side_deck)):
             if root.click_counts_side_deck[item] > 0:
-                root.listbox_side_decK.insert(tk.END, item + ': ' + str(root.item_dict_side_deck[item]))
+                root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_side_deck[item]))
         i = 0
         for item in sorted(list(Counter(root.item_dict_side_deck).elements())):
             try:
@@ -236,7 +234,7 @@ def on_item_right_click_side_deck(self, item):
             except FileNotFoundError:
                 print("Error: Image file not found.")
                 exit()
-            image_label = tk.Label(root.main_deck_cards, image=photo)
+            image_label = tk.Label(root.side_deck_cards, image=photo)
             x = i * 110
             y = 0
             if (i + 1) / 12 > 1 and (i + 1) / 12 <= 2:
