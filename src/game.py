@@ -8,8 +8,8 @@ def game_loop(root):
     pygame.init()
 
     # Set up the display
-    screen_width, screen_height = 1000, 750
-    screen = pygame.display.set_mode((screen_width, screen_height))
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    screen_width, screen_height = pygame.display.get_surface().get_size()
     pygame.display.set_caption('Yu-Gi-Oh! Duel')
 
     # Initialize Pygame
@@ -24,7 +24,7 @@ def game_loop(root):
 
     # Load card images
     image_folder = '../YGO Card Images/'
-    playmat_image = pygame.transform.scale(pygame.image.load(os.path.join(image_folder, 'ygo_playmat_clannadat.jpg')), (1000, 500))
+    playmat_image = pygame.transform.scale(pygame.image.load(os.path.join(image_folder, 'ygo_playmat_clannadat.jpg')), (screen_width, screen_height - 250))
     card_images = {root.items[card_name]: pygame.transform.scale(pygame.image.load(os.path.join(image_folder, f'{root.items[card_name]}.jpg')), (110, 160)) for card_name in player_hand}
 
     # Load card back image
@@ -77,13 +77,13 @@ def game_loop(root):
 
     for i, card_name in enumerate(player_hand):
         start_pos = (-100, y_position)
-        end_pos = (200 + i * 110, y_position)
+        end_pos = (screen_width // 3 + i * 110, y_position)
         slide_in_card(card_images[root.items[card_name]], start_pos, end_pos, 500, drawn_cards, drawn_cards_backs)
     
     root.backs = True
 
     # Define positions
-    opponent_x_positions = [200 + i * 110 for i in range(5)]
+    opponent_x_positions = [screen_width // 3 + i * 110 for i in range(5)]
     opponent_y_position = 0  # Position near the top
 
     # Blit card backs
@@ -101,7 +101,7 @@ def game_loop(root):
     text = font.render('Duel started: The duel is ready to begin.', True, (255, 255, 255))
 
     # Blit text to screen
-    screen.blit(text, (150, screen_height // 2 - 25))
+    screen.blit(text, (screen_width // 4, screen_height // 2))
     pygame.display.flip()
 
     # Wait for a short duration
@@ -112,5 +112,8 @@ def game_loop(root):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False  # Set running to False to end the while loop.
         pygame.time.wait(100)
     pygame.quit()
