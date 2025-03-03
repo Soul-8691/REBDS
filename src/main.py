@@ -268,24 +268,27 @@ def clear_window(window_):
 
 def construct_side_deck_menu(self):
     messagebox.showinfo("Side deck", "Construct a side deck consisting of 0-15 cards.")
-    button = tk.Button(root, text="Submit side deck", command=partial(on_button_click_side_deck, root))
+    button = tk.Button(root, text="Submit side deck", command=on_button_click_side_deck)
     button.pack()
     root.side_deck_cards = tk.Toplevel()
     root.side_deck_cards.title("Cards (side deck)")
     root.side_deck_cards.withdraw()
     button2 = tk.Button(root, text="Show/hide side deck cards", command=lambda: toggle_toplevel(root.side_deck_cards))
     button2.pack()
+    root.side_deck_cards.protocol("WM_DELETE_WINDOW", root.side_deck_cards.withdraw)
     root.listbox_window = tk.Toplevel()
     root.listbox_window.title("Side deck")
     root.listbox = tk.Listbox(root.listbox_window, width=50, height=35)
     root.listbox.pack()
     button3 = tk.Button(root, text="Show/hide side deck", command=lambda: toggle_toplevel(root.listbox_window))
     button3.pack()
+    root.listbox_window.protocol("WM_DELETE_WINDOW", root.listbox_window.withdraw)
     root.listbox_window.withdraw()
     root.card_image = tk.Toplevel()
     root.card_image.title("Card image")
     button4 = tk.Button(root, text="Show/hide card images", command=lambda: toggle_toplevel(root.card_image))
     button4.pack()
+    root.card_image.protocol("WM_DELETE_WINDOW", root.card_image.withdraw)
     root.card_var=tk.StringVar()
     root.my_entry = tk.Entry(root, textvariable=root.card_var)
     root.my_entry.pack()
@@ -308,26 +311,25 @@ def construct_side_deck_menu(self):
 def hide_button(self):
     self.pack_forget()
 
-def on_button_click(self):
+def on_button_click():
     if root.card_count < 1:
         messagebox.showinfo("Invalid deck size", "Your deck needs to consist of 40-60 cards.")
     else:
         messagebox.showinfo("Deck submitted", "Your deck is legal! Deck submitted.")
         clear_window(root)
         clear_top_level(root)
-        construct_side_deck_menu(self)
+        construct_side_deck_menu(root)
 
-def on_button_click_side_deck(self):
+def on_button_click_side_deck():
     messagebox.showinfo("Deck submitted", "Your deck is legal! Deck submitted.")
     clear_window(root)
     clear_top_level(root)
-    construct_side_deck_menu(self)
+    construct_side_deck_menu(root)
 
 def toggle_toplevel(toplevel):
     if toplevel.winfo_ismapped():
         toplevel.withdraw()  # Hide the window
     else:
-        toplevel.update()
         toplevel.deiconify() # Show the window
 
 def onEnter(self, card_image, card_name):
@@ -439,24 +441,27 @@ if __name__ == '__main__':
     root.title('Red-Eyes Black Duel Simulator')
     messagebox.showinfo("Main deck", "Construct a main deck consisting of 40-60 cards.")
     root.card_count = 0
-    button = tk.Button(root, text="Submit main deck", command=partial(on_button_click, root))
+    button = tk.Button(root, text="Submit main deck", command=on_button_click)
     button.pack()
     root.main_deck_cards = tk.Toplevel()
     root.main_deck_cards.title("Cards (main deck)")
     root.main_deck_cards.withdraw()
     button2 = tk.Button(root, text="Show/hide main deck cards", command=lambda: toggle_toplevel(root.main_deck_cards))
     button2.pack()
+    root.main_deck_cards.protocol("WM_DELETE_WINDOW", root.main_deck_cards.withdraw)
     root.listbox_window = tk.Toplevel()
     root.listbox_window.title("Main deck")
     root.listbox = tk.Listbox(root.listbox_window, width=50, height=35)
     root.listbox.pack()
     button3 = tk.Button(root, text="Show/hide main deck", command=lambda: toggle_toplevel(root.listbox_window))
     button3.pack()
+    root.listbox_window.protocol("WM_DELETE_WINDOW", root.listbox_window.withdraw)
     root.listbox_window.withdraw()
     root.card_image = tk.Toplevel()
     root.card_image.title("Card image")
     button4 = tk.Button(root, text="Show/hide card images", command=lambda: toggle_toplevel(root.card_image))
     button4.pack()
+    root.card_image.protocol("WM_DELETE_WINDOW", root.card_image.withdraw)
     root.card_var=tk.StringVar()
     root.my_entry = tk.Entry(root, textvariable=root.card_var)
     root.my_entry.pack()
