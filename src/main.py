@@ -493,15 +493,35 @@ def on_button_click():
         construct_extra_deck_menu(root)
 
 def on_button_click_extra_deck():
-    messagebox.showinfo("Deck submitted", "Your extra deck is legal! Deck submitted.")
+    messagebox.showinfo("Extra deck submitted", "Your extra deck is legal! Deck submitted.")
     clear_window(root)
     clear_top_level(root)
     construct_side_deck_menu(root)
 
 def on_button_click_side_deck():
-    messagebox.showinfo("Deck submitted", "Your deck is legal! Deck submitted.")
+    messagebox.showinfo("Side deck submitted", "Your deck is legal! Deck submitted.")
     clear_window(root)
     clear_top_level(root)
+    export = messagebox.askyesno("Export to YDK?")
+    if export:
+        root.deck_var=tk.StringVar()
+        root.ydk = tk.Entry(root, textvariable=root.deck_var)
+        root.ydk.pack()
+        root.ydk.bind("<Return>", on_enter)
+        root.ydk.focus_force()
+
+def on_enter(self):
+    open('src/' + root.ydk.get() + '.ydk', 'w').close()
+    root.ydk_file = open('src/' + root.ydk.get() + '.ydk', 'r+', encoding='utf8')
+    root.ydk_file.write('#main\n')
+    for card_name in sorted(list(root.item_dict)):
+        root.ydk_file.write(str(root.items[card_name]) + '\n')
+    root.ydk_file.write('#extra\n')
+    for card_name in sorted(list(root.item_dict_extra_deck)):
+        root.ydk_file.write(str(root.items[card_name]) + '\n')
+    root.ydk_file.write('!side\n')
+    for card_name in sorted(list(root.item_dict_side_deck)):
+        root.ydk_file.write(str(root.items[card_name]) + '\n')
 
 def toggle_toplevel(toplevel):
     if toplevel.winfo_ismapped():
@@ -682,20 +702,20 @@ if __name__ == '__main__':
     root.card_var=tk.StringVar()
     root.my_entry = tk.Entry(root, textvariable=root.card_var)
     root.my_entry.pack()
-    root.my_entry.bind("<KeyRelease>", lambda e: check(root.my_entry, items, e))
-    root.my_entry.focus_force()
     root.card_image.withdraw()
     root.item_dict = OrderedDict()
     card_info_data = open('src/YGOProDeck_Card_Info.json')
     card_info_data = json.load(card_info_data)
-    items = {}
+    root.items = {}
     for data in card_info_data['data']:
         card_name = data['name']
         card_id = data['id']
         if card_name == '7':
             card_name = 'Seven'
-        items.update({card_name: card_id})
-    root.click_counts = {item: 0 for item in items}
-    root.virtual_listbox = VirtualListbox(root, items)
+        root.items.update({card_name: card_id})
+    root.my_entry.bind("<KeyRelease>", lambda e: check(root.my_entry, root.items, e))
+    root.my_entry.focus_force()
+    root.click_counts = {item: 0 for item in root.items}
+    root.virtual_listbox = VirtualListbox(root, root.items)
     root.virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
     root.mainloop()
