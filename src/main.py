@@ -260,7 +260,7 @@ def construct_side_deck_menu(self):
         root.listbox_window.title("Side deck")
     else:
         root.listbox_window.title("Opponent side deck")
-    root.listbox = tk.Listbox(root.listbox_window, width=50, height=35)
+    root.listbox = tk.Listbox(root.listbox_window, width=50, height=45)
     root.listbox.pack()
     if root.opponent == False:
         button3 = tk.Button(root, text="Show/hide side deck", command=lambda: toggle_toplevel(root.listbox_window))
@@ -317,7 +317,7 @@ def construct_extra_deck_menu(self):
     root.extra_deck_cards.protocol("WM_DELETE_WINDOW", root.extra_deck_cards.withdraw)
     root.listbox_window = tk.Toplevel()
     root.listbox_window.title("Extra deck")
-    root.listbox = tk.Listbox(root.listbox_window, width=50, height=35)
+    root.listbox = tk.Listbox(root.listbox_window, width=50, height=45)
     root.listbox.pack()
     button3 = tk.Button(root, text="Show/hide extra deck", command=lambda: toggle_toplevel(root.listbox_window))
     button3.pack()
@@ -458,7 +458,7 @@ def toggle_toplevel(toplevel):
     else:
         toplevel.deiconify() # Show the window
 
-def onEnter(self, card_image, card_name):
+def onEnter(self, card_image, card_name, tag):
     clear_window(card_image)
     try:
         img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[card_name]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[card_name]) + '.jpg').resize((514, 750))
@@ -469,8 +469,9 @@ def onEnter(self, card_image, card_name):
     image_label = tk.Label(card_image, image=photo)
     image_label.pack()
     image_label.image = photo
+    item_highlight(self, tag)
 
-def onLeave(self, card_image, card_name):
+def onLeave(self, card_image, card_name, tag):
     clear_window(card_image)
     try:
         img = Image.open(os.path.join(sys._MEIPASS, '../YGO Card Images/' + str(self.items[card_name]) + '.jpg') if hasattr(sys, '_MEIPASS') else '../YGO Card Images/' + str(self.items[card_name]) + '.jpg').resize((514, 750))
@@ -481,6 +482,7 @@ def onLeave(self, card_image, card_name):
     image_label = tk.Label(card_image, image=photo)
     image_label.pack()
     image_label.image = photo
+    item_unhighlight(self, tag)
 
 def item_highlight(self, tag):
     self.itemconfig(tag, fill='red')  # Highlight with yellow color
@@ -612,10 +614,8 @@ class VirtualListbox(tk.Canvas):
             else:
                 self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_opponent(self, itm))
                 self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click_opponent(self, itm))
-            self.tag_bind(tag, '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
-            self.tag_bind(tag, '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
-            self.tag_bind(tag, '<Enter>', lambda event, t=tag: item_highlight(self, t))
-            self.tag_bind(tag, '<Leave>', lambda event, t=tag: item_unhighlight(self, t))
+            self.tag_bind(tag, '<Enter>', lambda event, itm=item, t=tag: onEnter(self, root.card_image, itm, t))
+            self.tag_bind(tag, '<Leave>', lambda event, itm=item, t=tag: onLeave(self, root.card_image, itm, t))
         self.config(scrollregion=(0, 0, 0, len(self.items_to_show) * self.item_height))
 
     def yview(self, *args):
@@ -659,10 +659,8 @@ class VirtualListboxSideDeck(tk.Canvas):
             else:
                 self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_side_deck_opponent(self, itm))
                 self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click_side_deck_opponent(self, itm))
-            self.tag_bind(tag, '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
-            self.tag_bind(tag, '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
-            self.tag_bind(tag, '<Enter>', lambda event, t=tag: item_highlight(self, t))
-            self.tag_bind(tag, '<Leave>', lambda event, t=tag: item_unhighlight(self, t))
+            self.tag_bind(tag, '<Enter>', lambda event, itm=item, t=tag: onEnter(self, root.card_image, itm, t))
+            self.tag_bind(tag, '<Leave>', lambda event, itm=item, t=tag: onLeave(self, root.card_image, itm, t))
         self.config(scrollregion=(0, 0, 0, len(self.items_to_show) * self.item_height))
 
     def yview(self, *args):
@@ -706,10 +704,8 @@ class VirtualListboxExtraDeck(tk.Canvas):
             else:
                 self.tag_bind(tag, "<Button-1>", lambda event, itm=item: on_item_click_extra_deck_opponent(self, itm))
                 self.tag_bind(tag, "<Button-3>", lambda event, itm=item: on_item_right_click_extra_deck_opponent(self, itm))
-            self.tag_bind(tag, '<Enter>', lambda event, itm=item: onEnter(self, root.card_image, itm))
-            self.tag_bind(tag, '<Leave>', lambda event, itm=item: onLeave(self, root.card_image, itm))
-            self.tag_bind(tag, '<Enter>', lambda event, t=tag: item_highlight(self, t))
-            self.tag_bind(tag, '<Leave>', lambda event, t=tag: item_unhighlight(self, t))
+            self.tag_bind(tag, '<Enter>', lambda event, itm=item, t=tag: onEnter(self, root.card_image, itm, t))
+            self.tag_bind(tag, '<Leave>', lambda event, itm=item, t=tag: onLeave(self, root.card_image, itm, t))
         self.config(scrollregion=(0, 0, 0, len(self.items_to_show) * self.item_height))
 
     def yview(self, *args):
@@ -827,7 +823,7 @@ def main():
         root.listbox_window.title("Main deck")
     else:
         root.listbox_window.title("Opponent main deck")
-    root.listbox = tk.Listbox(root.listbox_window, width=50, height=35)
+    root.listbox = tk.Listbox(root.listbox_window, width=50, height=45)
     root.listbox.pack()
     if root.opponent == False:
         button3 = tk.Button(root, text="Show/hide main deck", command=lambda: toggle_toplevel(root.listbox_window))
