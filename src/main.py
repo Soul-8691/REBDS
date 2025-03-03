@@ -421,15 +421,15 @@ def construct_side_deck_menu(self):
     root.my_entry.focus_force()
     root.card_image.withdraw()
     root.item_dict_side_deck = OrderedDict()
-    card_info_data = open('src/YGOProDeck_Card_Info.json')
-    card_info_data = json.load(card_info_data)
     items = {}
-    for data in card_info_data['data']:
+    for data in root.card_info_data['data']:
         card_name = data['name']
         card_id = data['id']
-        if card_name == '7':
-            card_name = 'Seven'
-        items.update({card_name: card_id})
+        card_type = data['type']
+        if card_type != 'XYZ Monster' and card_type != 'Synchro Monster' and card_type != 'Fusion Monster':
+            if card_name == '7':
+                card_name = 'Seven'
+            items.update({card_name: card_id})
     root.side_deck_click_counts = {item: 0 for item in items}
     root.virtual_listbox = VirtualListboxSideDeck(root, items)
     root.virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -467,15 +467,13 @@ def construct_extra_deck_menu(self):
     root.my_entry.focus_force()
     root.card_image.withdraw()
     root.item_dict_extra_deck = OrderedDict()
-    card_info_data = open('src/YGOProDeck_Card_Info.json')
-    card_info_data = json.load(card_info_data)
     items = {}
-    for data in card_info_data['data']:
+    for data in root.card_info_data['data']:
         card_name = data['name']
         card_id = data['id']
-        if card_name == '7':
-            card_name = 'Seven'
-        items.update({card_name: card_id})
+        card_type = data['type']
+        if card_type == 'XYZ Monster' or card_type == 'Synchro Monster' or card_type == 'Fusion Monster':
+            items.update({card_name: card_id})
     root.extra_deck_click_counts = {item: 0 for item in items}
     root.virtual_listbox = VirtualListboxExtraDeck(root, items)
     root.virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -502,7 +500,7 @@ def on_button_click_side_deck():
     messagebox.showinfo("Side deck submitted", "Your deck is legal! Deck submitted.")
     clear_window(root)
     clear_top_level(root)
-    export = messagebox.askyesno("Export to YDK?")
+    export = messagebox.askyesno("Export to YDK?", "Do you want to export to YDK format?")
     if export:
         root.deck_var=tk.StringVar()
         root.ydk = tk.Entry(root, textvariable=root.deck_var)
@@ -705,17 +703,21 @@ if __name__ == '__main__':
     root.card_image.withdraw()
     root.item_dict = OrderedDict()
     card_info_data = open('src/YGOProDeck_Card_Info.json')
-    card_info_data = json.load(card_info_data)
+    root.card_info_data = json.load(card_info_data)
     root.items = {}
-    for data in card_info_data['data']:
+    items_to_display = {}
+    for data in root.card_info_data['data']:
         card_name = data['name']
         card_id = data['id']
-        if card_name == '7':
-            card_name = 'Seven'
+        card_type = data['type']
+        if card_type != 'XYZ Monster' and card_type != 'Synchro Monster' and card_type != 'Fusion Monster':
+            if card_name == '7':
+                card_name = 'Seven'
+            items_to_display.update({card_name: card_id})
         root.items.update({card_name: card_id})
-    root.my_entry.bind("<KeyRelease>", lambda e: check(root.my_entry, root.items, e))
+    root.my_entry.bind("<KeyRelease>", lambda e: check(root.my_entry, items_to_display, e))
     root.my_entry.focus_force()
     root.click_counts = {item: 0 for item in root.items}
-    root.virtual_listbox = VirtualListbox(root, root.items)
+    root.virtual_listbox = VirtualListbox(root, items_to_display)
     root.virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
     root.mainloop()
