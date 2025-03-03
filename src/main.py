@@ -26,6 +26,8 @@ from collections import OrderedDict, Counter
 from PIL import Image, ImageTk
 
 open('src/main_deck.json', 'w').close()
+open('src/extra_deck.json', 'w').close()
+open('src/side_deck.json', 'w').close()
 
 # Update entry box with listbox clicked
 def fillout(my_entry, my_list, e):
@@ -171,7 +173,7 @@ def on_item_click_side_deck(self, item):
     else:
         root.click_counts[item] += 1
         root.side_deck_click_counts[item] += 1
-        update_json_file('src/main_deck.json', {item: root.click_counts[item]})
+        update_json_file('src/side_deck.json', {item: root.click_counts[item]})
         root.side_deck_card_count += 1
         root.item_dict_side_deck.update({item: root.side_deck_click_counts[item]})
         root.listbox_side_deck.delete(0, tk.END)
@@ -224,7 +226,7 @@ def on_item_right_click_side_deck(self, item):
     else:
         root.click_counts[item] -= 1
         root.side_deck_click_counts[item] -= 1
-        update_json_file('src/main_deck.json', {item: root.click_counts[item]})
+        update_json_file('src/side_deck.json', {item: root.click_counts[item]})
         root.side_deck_card_count -= 1
         root.item_dict_side_deck.update({item: root.click_counts_side_deck[item]})
         root.listbox_side_deck.delete(0, tk.END)
@@ -279,7 +281,7 @@ def on_item_click_extra_deck(self, item):
     else:
         root.click_counts[item] += 1
         root.extra_deck_click_counts[item] += 1
-        update_json_file('src/main_deck.json', {item: root.click_counts[item]})
+        update_json_file('src/extra_deck.json', {item: root.click_counts[item]})
         root.extra_deck_card_count += 1
         root.item_dict_extra_deck.update({item: root.extra_deck_click_counts[item]})
         root.listbox_extra_deck.delete(0, tk.END)
@@ -328,7 +330,7 @@ def on_item_right_click_extra_deck(self, item):
     else:
         root.click_counts[item] -= 1
         root.extra_deck_click_counts[item] -= 1
-        update_json_file('src/main_deck.json', {item: root.click_counts[item]})
+        update_json_file('src/extra_deck.json', {item: root.click_counts[item]})
         root.extra_deck_card_count -= 1
         root.item_dict_extra_deck.update({item: root.click_counts_extra_deck[item]})
         root.listbox_extra_deck.delete(0, tk.END)
