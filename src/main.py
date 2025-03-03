@@ -173,10 +173,13 @@ def on_item_click_side_deck(self, item):
         root.side_deck_click_counts[item] += 1
         update_json_file('src/main_deck.json', {item: root.click_counts[item]})
         root.side_deck_card_count += 1
-        root.item_dict.update({item: root.click_counts[item]})
         root.item_dict_side_deck.update({item: root.side_deck_click_counts[item]})
         root.listbox_side_deck.delete(0, tk.END)
-        root.listbox_side_deck.insert(0, 'Cards in side deck: ' + str(root.side_deck_card_count))
+        root.listbox_side_deck.insert(0, 'Cards in main deck:')
+        for item in sorted(list(root.item_dict)):
+            if root.click_counts[item] > 0:
+                root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict[item]))
+        root.listbox_side_deck.insert(tk.END, 'Cards in side deck: ' + str(root.side_deck_card_count))
         for item in sorted(list(root.item_dict_side_deck)):
             if root.side_deck_click_counts[item] > 0:
                 root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_side_deck[item]))
@@ -219,10 +222,13 @@ def on_item_right_click_side_deck(self, item):
         root.side_deck_click_counts[item] -= 1
         update_json_file('src/main_deck.json', {item: root.click_counts[item]})
         root.side_deck_card_count -= 1
-        root.item_dict.update({item: root.click_counts[item]})
         root.item_dict_side_deck.update({item: root.click_counts_side_deck[item]})
         root.listbox_side_deck.delete(0, tk.END)
-        root.listbox_side_deck.insert(0, 'Cards in side deck: ' + str(root.side_deck_card_count))
+        root.listbox_side_deck.insert(0, 'Cards in main deck:')
+        for item in sorted(list(root.item_dict)):
+            if root.click_counts[item] > 0:
+                root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict[item]))
+        root.listbox_side_deck.insert(tk.END, 'Cards in side deck: ' + str(root.side_deck_card_count))
         for item in sorted(list(root.item_dict_side_deck)):
             if root.click_counts_side_deck[item] > 0:
                 root.listbox_side_deck.insert(tk.END, item + ': ' + str(root.item_dict_side_deck[item]))
