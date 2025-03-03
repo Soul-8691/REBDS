@@ -553,29 +553,51 @@ def construct_side_deck_menu(self):
     root.virtual_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
 def construct_extra_deck_menu(self):
-    messagebox.showinfo("Extra deck", "Construct a extra deck consisting of 0-15 cards.")
-    button = tk.Button(root, text="Submit extra deck", command=on_button_click_extra_deck)
+    if root.opponent == False:
+        messagebox.showinfo("Extra deck", "Construct a extra deck consisting of 0-15 cards.")
+        button = tk.Button(root, text="Submit extra deck", command=on_button_click_extra_deck)
+    else:
+        messagebox.showinfo("Opponent extra deck", "Construct an opponent extra deck consisting of 0-15 cards.")
+        button = tk.Button(root, text="Submit opponent extra deck", command=on_button_click_extra_deck)
     button.pack()
     root.extra_deck_cards = tk.Toplevel()
-    root.extra_deck_cards.title("Cards (extra deck)")
+    if root.opponent == False:
+        root.extra_deck_cards.title("Cards (extra deck)")
+    else:
+        root.extra_deck_cards.title("Opponent cards (extra deck)")
     root.extra_deck_cards.withdraw()
-    button2 = tk.Button(root, text="Show/hide extra deck cards", command=lambda: toggle_toplevel(root.extra_deck_cards))
+    if root.opponent == False:
+        button2 = tk.Button(root, text="Show/hide extra deck cards", command=lambda: toggle_toplevel(root.extra_deck_cards))
+    else:
+        button2 = tk.Button(root, text="Show/hide opponent extra deck cards", command=lambda: toggle_toplevel(root.extra_deck_cards))
     button2.pack()
     root.extra_deck_cards.protocol("WM_DELETE_WINDOW", root.extra_deck_cards.withdraw)
     root.listbox_window = tk.Toplevel()
-    root.listbox_window.title("Extra deck")
+    if root.opponent == False:
+        root.listbox_window.title("Extra deck")
+    else:
+        root.listbox_window.title("Opponent extra deck")
     root.listbox = tk.Listbox(root.listbox_window, width=50, height=45)
     root.listbox.pack()
-    button3 = tk.Button(root, text="Show/hide extra deck", command=lambda: toggle_toplevel(root.listbox_window))
+    if root.opponent == False:
+        button3 = tk.Button(root, text="Show/hide extra deck", command=lambda: toggle_toplevel(root.listbox_window))
+    else:
+        button3 = tk.Button(root, text="Show/hide opponent extra deck", command=lambda: toggle_toplevel(root.listbox_window))
     button3.pack()
     root.listbox_window.protocol("WM_DELETE_WINDOW", root.listbox_window.withdraw)
     root.listbox_window.withdraw()
     root.card_image = tk.Toplevel()
     root.card_image.title("Card image")
-    button4 = tk.Button(root, text="Show/hide card images", command=lambda: toggle_toplevel(root.card_image))
+    if root.opponent == False:
+        button4 = tk.Button(root, text="Show/hide card images", command=lambda: toggle_toplevel(root.card_image))
+    else:
+        button4 = tk.Button(root, text="Show/hide opponent card images", command=lambda: toggle_toplevel(root.card_image))
     button4.pack()
     root.card_image.protocol("WM_DELETE_WINDOW", root.card_image.withdraw)
-    button5 = tk.Button(root, text="Show/hide main deck cards", command=lambda: toggle_toplevel(root.main_deck_cards))
+    if root.opponent == False:
+        button5 = tk.Button(root, text="Show/hide main deck cards", command=lambda: toggle_toplevel(root.main_deck_cards))
+    else:
+        button5 = tk.Button(root, text="Show/hide opponent main deck cards", command=lambda: toggle_toplevel(root.main_deck_cards))
     button5.pack()
     root.card_var=tk.StringVar()
     root.my_entry = tk.Entry(root, textvariable=root.card_var)
